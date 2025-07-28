@@ -1,0 +1,284 @@
+@tailwind base; @tailwind components; @tailwind utilities;
+
+
+/* Tailwind already loaded — add below ↓ */
+
+body {
+  overflow-x: hidden;
+}
+
+/* WhatsApp lime (#00FF00) */
+.whatsapp-glow {
+  position: relative;
+  border-radius: 50%;
+  animation: pulse-lime 2s ease-in-out infinite;
+}
+.whatsapp-glow::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent,
+    #00FF00,
+    transparent,
+    #00FF00,
+    transparent
+  );
+  filter: blur(8px);
+  opacity: 0.75;
+  animation: spin 4s linear infinite;
+  z-index: -1;
+}
+@keyframes pulse-lime {
+  0%   { box-shadow: 0 0 0 0 #00FF00; }
+  50%  { box-shadow: 0 0 16px 4px #00FF00; }
+  100% { box-shadow: 0 0 0 0 #00FF00; }
+}
+
+/* LinkedIn blue (#0A66C2) */
+.linkedin-glow {
+  position: relative;
+  border-radius: 50%;
+  animation: pulse-blue 2s ease-in-out infinite;
+}
+.linkedin-glow::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent,
+    #0A66C2,
+    transparent,
+    #0A66C2,
+    transparent
+  );
+  filter: blur(8px);
+  opacity: 0.75;
+  animation: spin 4s linear infinite;
+  z-index: -1;
+}
+@keyframes pulse-blue {
+  0%   { box-shadow: 0 0 0 0 #0A66C2; }
+  50%  { box-shadow: 0 0 16px 4px #0A66C2; }
+  100% { box-shadow: 0 0 0 0 #0A66C2; }
+}
+
+/* Gmail red (#D93025) */
+.gmail-glow {
+  position: relative;
+  border-radius: 50%;
+  animation: pulse-red 2s ease-in-out infinite;
+}
+.gmail-glow::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent,
+    #D93025,
+    transparent,
+    #D93025,
+    transparent
+  );
+  filter: blur(8px);
+  opacity: 0.75;
+  animation: spin 4s linear infinite;
+  z-index: -1;
+}
+@keyframes pulse-red {
+  0%   { box-shadow: 0 0 0 0 #D93025; }
+  50%  { box-shadow: 0 0 16px 4px #D93025; }
+  100% { box-shadow: 0 0 0 0 #D93025; }
+}
+
+/* shared spin */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
+.btn-12,
+.btn-12 *,
+.btn-12 :after,
+.btn-12 :before,
+.btn-12:after,
+.btn-12:before {
+  border: 0 solid;
+  box-sizing: border-box;
+}
+.btn-12 {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: button;
+  background-color: #000;
+  background-image: none;
+  color: #fff;
+  cursor: pointer;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif,
+    Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+  font-size: 100%;
+  font-weight: 900;
+  line-height: 1.5;
+  margin: 0;
+  -webkit-mask-image: -webkit-radial-gradient(#000, #fff);
+  padding: 0;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  border-width: 2px;
+  overflow: hidden;
+  padding: 0.5rem 1.5rem;
+  position: relative;
+  white-space: nowrap;
+}
+.btn-12 span {
+  mix-blend-mode: difference;
+}
+.btn-12:after,
+.btn-12:before {
+  background: linear-gradient(
+    90deg,
+    #fff 25%,
+    transparent 0,
+    transparent 50%,
+    #fff 0,
+    #fff 75%,
+    transparent 0
+  );
+  content: "";
+  inset: 0;
+  position: absolute;
+  transform: translateY(var(--progress, 100%));
+  transition: transform 0.2s ease;
+}
+.btn-12:after {
+  --progress: -100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0,
+    transparent 25%,
+    #fff 0,
+    #fff 50%,
+    transparent 0,
+    transparent 75%,
+    #fff 0
+  );
+  z-index: -1;
+}
+.btn-12:hover:after,
+.btn-12:hover:before {
+  --progress: 0;
+}
+.btn-12.active {
+  background-color: #fff;
+  color: #fff;
+}
+
+.animated-border {
+  position: sticky;
+  overflow: hidden;
+}
+.animated-border::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    #ffffff 0%,
+    #f97316 33%,
+    #0ea5e9 66%,
+    #ffffff 100%
+  );
+  background-size: 300% 100%;
+  animation: borderSwipe 3s linear infinite;
+}
+@keyframes borderSwipe {
+  0%   { background-position: 0%   0%; }
+  100% { background-position: 100% 0%; }
+}
+
+/* horizontal loop with duplication */
+.scroll-strip {
+  display: flex;
+  gap: 1.5rem;
+  width: max-content;
+  animation: loopLeft 30s linear infinite;
+}
+@keyframes loopLeft {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.scroll-strip:hover {
+  animation-play-state: paused;
+}
+
+
+/* Tooltip Button Styles */
+.tooltip-btn-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-btn {
+  position: relative;
+  background: #000;
+  color: #fff;
+  padding: 15px 24px;
+  border-radius: 10px;
+  font-size: 17px;
+  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  margin-bottom: 32px;
+}
+
+.tooltip-text {
+  position: absolute;
+  left: 50%;
+  top: -45px;
+  transform: translateX(-50%);
+  background: #fff;
+  color: #000;
+  padding: 5px 12px;
+  border-radius: 5px;
+  font-size: 14px;
+  box-shadow: 0 10px 10px rgba(0,0,0,0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.tooltip-text::before {
+  content: "";
+  position: absolute;
+  height: 8px;
+  width: 8px;
+  background: #fff;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.tooltip-btn-wrapper:hover .tooltip-text,
+.tooltip-btn-wrapper:focus-within .tooltip-text {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.tooltip-btn-wrapper:hover .tooltip-btn,
+.tooltip-btn-wrapper:focus-within .tooltip-btn {
+  background: linear-gradient(320deg, rgb(3, 77, 146), rgb(0, 60, 255));
+  color: #fff;
+}
