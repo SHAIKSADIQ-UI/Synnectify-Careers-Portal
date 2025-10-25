@@ -25,7 +25,7 @@ const clients = [
   },
   {
     name: 'Synnectify',
-    img: 'https://ik.imagekit.io/wehbarmxp7/image.png?updatedAt=1753424827730',
+    img: 'https://i.ibb.co/ZpsKZGMp/1c570516-e22f-478d-bfc1-925784190153.jpg',
     alt: 'Synnectify',
   },
   {

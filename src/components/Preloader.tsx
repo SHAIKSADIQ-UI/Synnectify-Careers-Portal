@@ -7,7 +7,7 @@ const Preloader = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 4000); // 2 seconds preloader
+    }, 900); // Changed from 4000ms to 800ms (under 1 second)
 
     return () => clearTimeout(timer);
   }, []);

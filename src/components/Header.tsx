@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import UserProfile from "./UserProfile";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { user } = useAuth();
   const isActive = (path: string) => location.pathname === path;
 
   return (
@@ -45,15 +48,17 @@ const Header = () => {
               <Link
                 key={to}
                 to={to}
-                className={`text-white hover:text-orange-500 transition-colors font-medium ${
+                className={`text-white hover:text-orange-500 transition-colors font-bold text-lg shadow-sm ${
                   isActive(to) ? "text-orange-500" : ""
                 }`}
+                style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.3)' }}
               >
                 {label}
               </Link>
             ))}
 
-            
+            {/* User Profile (only show when logged in) */}
+            {user && <UserProfile />}
           </nav>
 
           {/* Mobile Toggle */}
@@ -84,7 +89,8 @@ const Header = () => {
                 <Link
                   key={path}
                   to={path}
-                  className="text-white hover:text-orange-500 transition-colors font-medium"
+                  className="text-white hover:text-orange-500 transition-colors font-bold text-lg"
+                  style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.3)' }}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {path === "/"

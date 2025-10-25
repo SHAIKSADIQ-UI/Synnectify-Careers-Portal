@@ -1,39 +1,40 @@
-const express = require('express');
-const cors = require('cors');
-const multer = require('multer');
-const nodemailer = require('nodemailer');
+// server.js
+import express from 'express';
+import cors from 'cors';
+import multer from 'multer';
+import nodemailer from 'nodemailer';
 
 const app = express();
 app.use(cors());
-
-// Use multer for file uploads (store in memory)
 const upload = multer({ storage: multer.memoryStorage() });
 
 app.post('/api/apply', upload.single('resume'), async (req, res) => {
   const { firstName, lastName, email, phone, dob, linkedin, position } = req.body;
   const resume = req.file;
 
-  // Set up Nodemailer transporter
+  // Set up Nodemailer transporter (App Password method)
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
     auth: {
       user: 'sriramborra00@gmail.com', // your Gmail
-      pass: '',       // your App Password from Google
+      pass: 'fjde dcfe qxbp jsjd',    // your App Password from Google
     },
   });
 
   // Email content
   const mailOptions = {
     from: 'sriramborra00@gmail.com', // always your company Gmail
-    to: 'sriramborra00@gmail.com',   // receive at your company Gmail
+    to: 'career@synnectify.com',  // Hostinger mailbox
     subject: `New Job Application for ${position} from ${firstName} ${lastName}`,
     text: `
-      Position: ${position}
-      Name: ${firstName} ${lastName}
-      Email: ${email}
-      Phone: ${phone}
-      DOB: ${dob}
-      LinkedIn: ${linkedin}
+Position: ${position}
+Name: ${firstName} ${lastName}
+Email: ${email}
+Phone: ${phone}
+DOB: ${dob}
+LinkedIn: ${linkedin}
     `,
     attachments: resume
       ? [

@@ -24,7 +24,7 @@ const clients = [
   },
   {
     name: '',
-    img: 'https://imagekit.io/public/share/wehbarmxp7/f77c31d6cfc2eaf2ed37e16cfcc2f634cac8e8e8bad49721542b57379b4b1626f4f0f77f779051376d4a9db13dc56865f544eaa0d0058bd79c117176b15d3b6637a2cbd973e4f0f178c6319566c10fd5',
+    img: 'https://i.ibb.co/ZpsKZGMp/1c570516-e22f-478d-bfc1-925784190153.jpg',
     alt: 'Synnectify',
   },
   {

@@ -7,6 +7,10 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  server: {
+    port: 5173,
+    strictPort: false, // Will try 5174, 5175 if 5173 is busy
+  },
 });
 
 
