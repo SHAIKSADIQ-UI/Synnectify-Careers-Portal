@@ -208,8 +208,8 @@ const allowedOrigins = [
 **Production (specific domain only):**
 ```javascript
 const allowedOrigins = [
-  'https://synnectify.com',
-  'https://www.synnectify.com'
+  'https://technologies.synnectify.com',
+  'https://www.technologies.synnectify.com'
 ];
 ```
 

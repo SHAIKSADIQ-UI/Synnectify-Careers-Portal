@@ -82,7 +82,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    // Add event listener for beforeunload to handle auto-logout
+    const handleBeforeUnload = () => {
+      // Clear admin session if exists
+      localStorage.removeItem("admin_token");
+      localStorage.removeItem("admin_user");
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
   }, []);
 
   const loginWithGoogle = async () => {

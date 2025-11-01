@@ -10,6 +10,11 @@ const Header = () => {
   const { user } = useAuth();
   const isActive = (path: string) => location.pathname === path;
 
+  // Hide header on admin pages
+  if (location.pathname.startsWith('/admin')) {
+    return null;
+  }
+
   return (
     <header className="bg-transparent shadow-none absolute w-full z-50">
       {/* Top Bar */}

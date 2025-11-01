@@ -50,7 +50,7 @@
 
 
 // src/App.tsx
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { RequireAuth } from './hooks/useRequireAuth';
 
@@ -72,6 +72,16 @@ import Preloader from './components/Preloader';
 import SocialBot from './components/SocialBot';
 import ScrollToTopButton from './components/ScrollToTopButton';
 
+// Component to conditionally render Header
+const ConditionalHeader = () => {
+  const location = useLocation();
+  
+  // Don't show header on admin pages
+  const isAdminPage = location.pathname.startsWith('/admin');
+  
+  return !isAdminPage ? <Header /> : null;
+};
+
 function App() {
   return (
     <Preloader>
@@ -87,7 +97,7 @@ function App() {
             <SocialBot />
             <ScrollToTopButton />
 
-            <Header />
+            <ConditionalHeader />
             <main>
               <Routes>
                 <Route path="/" element={<HomePage />} />

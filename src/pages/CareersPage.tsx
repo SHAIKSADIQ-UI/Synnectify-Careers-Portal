@@ -37,12 +37,16 @@ const CareersPage = () => {
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userApplications, setUserApplications] = useState<any[]>([]); // ✅ Add state for user applications
   const navigate = useNavigate();
   const { user, loginWithGoogle } = useAuth();
 
   useEffect(() => {
     fetchJobs();
-  }, []);
+    if (user) {
+      fetchUserApplications(); // ✅ Fetch user applications when user is available
+    }
+  }, [user]);
 
   const fetchJobs = async () => {
     try {
@@ -58,7 +62,32 @@ const CareersPage = () => {
     }
   };
 
+  // ✅ Fetch user's applications to check for duplicates
+  const fetchUserApplications = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch(`${API_URL}/applications?email=${encodeURIComponent(user.email)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setUserApplications(data);
+      }
+    } catch (error) {
+      console.error("Error fetching user applications:", error);
+    }
+  };
+
   const handleApplyClick = async (jobId: string, jobTitle: string) => {
+    // ✅ Check if user has already applied for this job
+    const hasApplied = userApplications.some(app => 
+      app.jobId && app.jobId._id === jobId
+    );
+    
+    if (hasApplied) {
+      alert("You have already applied for this position.");
+      return;
+    }
+
     if (user) {
       navigate("/apply", { state: { jobId, position: jobTitle } });
       return;

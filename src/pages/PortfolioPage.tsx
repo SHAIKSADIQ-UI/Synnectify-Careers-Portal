@@ -148,7 +148,7 @@ const PortfolioPage = () => {
           'Increased user engagement',
           'Optimized business processes'
       ],
-      liveUrl: "https://synnectify.com/",
+      liveUrl: "https:///",
       featured: false,
     },
     {
