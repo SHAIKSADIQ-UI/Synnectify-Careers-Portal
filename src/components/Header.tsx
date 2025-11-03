@@ -68,7 +68,7 @@ const Header = () => {
 
           {/* Mobile Toggle */}
           <button
-            className="md:hidden p-2"
+            className="md:hidden p-2 mobile-menu-button"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? (

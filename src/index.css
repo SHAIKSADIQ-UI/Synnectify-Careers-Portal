@@ -12,6 +12,17 @@
   background-clip: text;
 }
 
+/* Mobile menu button - ensure no hover effects */
+.mobile-menu-button {
+  opacity: 1 !important;
+  transition: none !important;
+}
+
+.mobile-menu-button:hover {
+  opacity: 1 !important;
+  transition: none !important;
+}
+
 body {
   overflow-x: hidden;
 }

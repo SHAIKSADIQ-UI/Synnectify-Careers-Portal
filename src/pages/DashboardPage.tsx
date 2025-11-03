@@ -257,8 +257,7 @@ const DashboardPage = () => {
               {user && <UserProfile />}
               {/* Hamburger Menu */}
               <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 text-white"
+                className="p-2 text-white mobile-menu-button"
                 aria-label="Toggle menu"
               >
                 {isMobileMenuOpen ? (
