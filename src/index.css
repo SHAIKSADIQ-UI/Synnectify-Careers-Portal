@@ -16,11 +16,36 @@
 .mobile-menu-button {
   opacity: 1 !important;
   transition: none !important;
+  visibility: visible !important;
 }
 
 .mobile-menu-button:hover {
   opacity: 1 !important;
   transition: none !important;
+  visibility: visible !important;
+}
+
+/* Ensure SVG icons inside mobile menu button are always visible */
+.mobile-menu-button svg {
+  opacity: 1 !important;
+  transition: none !important;
+  display: block !important;
+  visibility: visible !important;
+  fill: none !important;
+}
+
+.mobile-menu-button:hover svg {
+  opacity: 1 !important;
+  transition: none !important;
+  visibility: visible !important;
+}
+
+/* Override any potential conflicting styles */
+.mobile-menu-button svg *,
+.mobile-menu-button:hover svg * {
+  opacity: 1 !important;
+  transition: none !important;
+  visibility: visible !important;
 }
 
 body {
