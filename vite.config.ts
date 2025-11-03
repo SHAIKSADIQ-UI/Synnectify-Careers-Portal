@@ -16,7 +16,34 @@ export default defineConfig({
         short_name: 'SYNNECTIFY',
         description: 'Professional IT Solutions & Digital Transformation',
         theme_color: '#ffffff',
+        background_color: '#ffffff',
+        display: 'standalone',
         icons: [
+          {
+            src: 'logo.png',
+            sizes: '48x48',
+            type: 'image/png'
+          },
+          {
+            src: 'logo.png',
+            sizes: '72x72',
+            type: 'image/png'
+          },
+          {
+            src: 'logo.png',
+            sizes: '96x96',
+            type: 'image/png'
+          },
+          {
+            src: 'logo.png',
+            sizes: '144x144',
+            type: 'image/png'
+          },
+          {
+            src: 'logo.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
           {
             src: 'logo.png',
             sizes: '512x512',
