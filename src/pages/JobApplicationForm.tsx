@@ -384,17 +384,8 @@ const JobApplicationForm = () => {
   }, [position, navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-start mb-6">
-          <button
-            onClick={() => navigate("/careers")}
-            className="inline-flex items-center bg-gradient-to-r from-orange-500 to-blue-500 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-md"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Careers
-          </button>
-        </div>
 
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
           {/* Header with gradient */}
@@ -824,6 +815,17 @@ const JobApplicationForm = () => {
               {isSubmitting ? "Submitting..." : "Submit Application"}
             </button>
           </form>
+        </div>
+
+        {/* Moved the Back to Careers button to the bottom */}
+        <div className="flex justify-center mt-8">
+          <button
+            onClick={() => navigate("/careers")}
+            className="inline-flex items-center bg-gradient-to-r from-orange-500 to-blue-500 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-md"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Careers
+          </button>
         </div>
       </div>
 

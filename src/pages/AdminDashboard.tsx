@@ -330,16 +330,9 @@ const AdminDashboard = () => {
 
   // Function to mark an application as completed
   const markAsCompleted = async (appId: string) => {
-    if (!authToken) {
-      console.error("No auth token available");
-      return;
-    }
+    if (!authToken) return;
 
     try {
-      console.log("Attempting to mark application as completed:", appId);
-      console.log("API URL:", `${API_URL}/applications/${appId}`);
-      console.log("Auth token present:", !!authToken);
-      
       const response = await fetch(`${API_URL}/applications/${appId}`, {
         method: "PATCH",
         headers: {
@@ -347,18 +340,12 @@ const AdminDashboard = () => {
           Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify({
-          status: "Completed"
+          status: "Completed",
+          note: adminNote
         }),
       });
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-      
-      const responseText = await response.text();
-      console.log("Response text:", responseText);
-
       if (response.ok) {
-        console.log("Successfully marked application as completed");
         // Refresh applications
         fetchData();
         // Close confirmation popup
@@ -368,10 +355,12 @@ const AdminDashboard = () => {
         setShowApplicationModal(false);
         setSelectedApplication(null);
       } else {
-        console.error("Failed to mark application as completed. Status:", response.status, "Response:", responseText);
+        // Silently handle error without popup
+        console.error("Failed to mark application as completed");
       }
     } catch (error) {
       console.error("Error marking application as completed:", error);
+      // Silently handle error without popup
     }
   };
 
@@ -743,8 +732,6 @@ const AdminDashboard = () => {
                                   ? "bg-gray-100 text-gray-700"
                                   : app.status === "Interview"
                                   ? "bg-purple-100 text-purple-700"
-                                  : app.status === "Completed"
-                                  ? "bg-green-100 text-green-700"
                                   : "bg-yellow-100 text-yellow-700"
                               }`}
                             >
@@ -880,24 +867,48 @@ const AdminDashboard = () => {
                                 <CheckCircle className="w-4 h-4 mr-1" />
                                 Mark as Completed
                               </button>
+                              <button
+                                onClick={() => deleteApplication(app._id)}
+                                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm flex items-center"
+                                title="Delete application permanently"
+                              >
+                                <Trash2 className="w-4 h-4 mr-1" />
+                                Delete
+                              </button>
                             </>
                           )}
                           
-                          {(app.status === "Rejected" || app.status === "Ignored") && (
+                          {app.status === "Completed" && (
                             <>
-                              {/* No additional action buttons for rejected or ignored applications */}
+                              <button
+                                onClick={() => deleteApplication(app._id)}
+                                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm flex items-center"
+                                title="Delete application permanently"
+                              >
+                                <Trash2 className="w-4 h-4 mr-1" />
+                                Delete
+                              </button>
+                              <button
+                                onClick={() => setShowApplicationModal(false)}
+                                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors text-sm flex items-center"
+                              >
+                                <EyeOff className="w-4 h-4 mr-1" />
+                                Close
+                              </button>
                             </>
                           )}
                           
-                          {/* Delete button is always available */}
-                          <button
-                            onClick={() => deleteApplication(app._id)}
-                            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm flex items-center"
-                            title="Delete application permanently"
-                          >
-                            <Trash2 className="w-4 h-4 mr-1" />
-                            Delete
-                          </button>
+                          {/* Delete button is always available for other statuses */}
+                          {(app.status === "Pending" || app.status === "Shortlisted" || app.status === "Rejected" || app.status === "Ignored") && (
+                            <button
+                              onClick={() => deleteApplication(app._id)}
+                              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm flex items-center"
+                              title="Delete application permanently"
+                            >
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Delete
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -1367,41 +1378,101 @@ const AdminDashboard = () => {
                 >
                   Close
                 </button>
-                {selectedApplication.status !== "Shortlisted" && (
-                  <button
-                    onClick={() => updateApplicationStatus(selectedApplication._id, "Shortlisted", adminNote)}
-                    className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-semibold flex items-center"
-                  >
-                    <UserCheck className="w-4 h-4 mr-2" />
-                    Shortlist
-                  </button>
+                
+                {/* Buttons for Interview Scheduled Applications */}
+                {selectedApplication.status === "Interview" && (
+                  <>
+                    <button
+                      onClick={() => updateApplicationStatus(selectedApplication._id, "Rejected", adminNote)}
+                      className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold flex items-center"
+                    >
+                      <UserX className="w-4 h-4 mr-2" />
+                      Reject
+                    </button>
+                    <button
+                      onClick={() => updateApplicationStatus(selectedApplication._id, "Ignored", adminNote)}
+                      className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-semibold flex items-center"
+                    >
+                      <UserMinus className="w-4 h-4 mr-2" />
+                      Ignore
+                    </button>
+                    <button
+                      onClick={() => openCompleteConfirmation(selectedApplication)}
+                      className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-semibold flex items-center"
+                    >
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Mark as Completed
+                    </button>
+                    <button
+                      onClick={() => deleteApplication(selectedApplication._id)}
+                      className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold flex items-center"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete
+                    </button>
+                  </>
                 )}
-                {selectedApplication.status !== "Rejected" && (
-                  <button
-                    onClick={() => updateApplicationStatus(selectedApplication._id, "Rejected", adminNote)}
-                    className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold flex items-center"
-                  >
-                    <UserX className="w-4 h-4 mr-2" />
-                    Reject
-                  </button>
+                
+                {/* Buttons for Completed Applications */}
+                {selectedApplication.status === "Completed" && (
+                  <>
+                    <button
+                      onClick={() => deleteApplication(selectedApplication._id)}
+                      className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold flex items-center"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete
+                    </button>
+                    <button
+                      onClick={() => setShowApplicationModal(false)}
+                      className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-semibold flex items-center"
+                    >
+                      <EyeOff className="w-4 h-4 mr-2" />
+                      Close
+                    </button>
+                  </>
                 )}
-                {selectedApplication.status !== "Ignored" && (
-                  <button
-                    onClick={() => updateApplicationStatus(selectedApplication._id, "Ignored", adminNote)}
-                    className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-semibold flex items-center"
-                  >
-                    <UserMinus className="w-4 h-4 mr-2" />
-                    Ignore
-                  </button>
-                )}
-                {selectedApplication.status === "Shortlisted" && (
-                  <button
-                    onClick={() => openInterviewModal()}
-                    className="px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-semibold flex items-center"
-                  >
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Schedule Interview
-                  </button>
+                
+                {/* Buttons for other statuses */}
+                {selectedApplication.status !== "Interview" && selectedApplication.status !== "Completed" && (
+                  <>
+                    {selectedApplication.status !== "Shortlisted" && (
+                      <button
+                        onClick={() => updateApplicationStatus(selectedApplication._id, "Shortlisted", adminNote)}
+                        className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-semibold flex items-center"
+                      >
+                        <UserCheck className="w-4 h-4 mr-2" />
+                        Shortlist
+                      </button>
+                    )}
+                    {selectedApplication.status !== "Rejected" && (
+                      <button
+                        onClick={() => updateApplicationStatus(selectedApplication._id, "Rejected", adminNote)}
+                        className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold flex items-center"
+                      >
+                        <UserX className="w-4 h-4 mr-2" />
+                        Reject
+                      </button>
+                    )}
+                    {selectedApplication.status !== "Ignored" && (
+                      <button
+                        onClick={() => updateApplicationStatus(selectedApplication._id, "Ignored", adminNote)}
+                        className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-semibold flex items-center"
+                      >
+                        <UserMinus className="w-4 h-4 mr-2" />
+                        Ignore
+                      </button>
+                    )}
+                    {selectedApplication.status === "Shortlisted" && (
+                      <button
+                        onClick={() => openInterviewModal()}
+                        className="px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-semibold flex items-center"
+                      >
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Schedule Interview
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
             </div>
