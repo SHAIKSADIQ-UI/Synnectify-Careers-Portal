@@ -20,33 +20,33 @@
   display: block !important;
   position: relative !important;
   z-index: 9999 !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  cursor: pointer !important;
+  -webkit-tap-highlight-color: transparent !important;
 }
 
-.mobile-menu-button:hover {
+/* Completely remove all hover, active, and focus effects */
+.mobile-menu-button:hover,
+.mobile-menu-button:active,
+.mobile-menu-button:focus,
+.mobile-menu-button:visited,
+.mobile-menu-button:link {
   opacity: 1 !important;
   transition: none !important;
   visibility: visible !important;
   display: block !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
 }
 
-.mobile-menu-button:active {
-  opacity: 1 !important;
-  transition: none !important;
-  visibility: visible !important;
-  display: block !important;
-}
-
-.mobile-menu-button:focus {
-  opacity: 1 !important;
-  transition: none !important;
-  visibility: visible !important;
-  display: block !important;
-}
-
-.mobile-menu-button:before {
-  display: none !important;
-}
-
+.mobile-menu-button:before,
 .mobile-menu-button:after {
   display: none !important;
 }
@@ -61,67 +61,47 @@
   pointer-events: none !important;
   position: relative !important;
   z-index: 1 !important;
+  width: 24px !important;
+  height: 24px !important;
 }
 
-.mobile-menu-button:hover svg {
-  opacity: 1 !important;
-  transition: none !important;
-  visibility: visible !important;
-  display: block !important;
-}
-
-.mobile-menu-button:active svg {
-  opacity: 1 !important;
-  transition: none !important;
-  visibility: visible !important;
-  display: block !important;
-}
-
+/* Remove all possible SVG hover effects */
+.mobile-menu-button svg:hover,
+.mobile-menu-button svg:active,
+.mobile-menu-button svg:focus,
+.mobile-menu-button:hover svg,
+.mobile-menu-button:active svg,
 .mobile-menu-button:focus svg {
   opacity: 1 !important;
   transition: none !important;
   visibility: visible !important;
   display: block !important;
+  transform: none !important;
+  filter: none !important;
 }
 
 /* Override any potential conflicting styles */
 .mobile-menu-button svg *,
-.mobile-menu-button:hover svg * {
-  opacity: 1 !important;
-  transition: none !important;
-  visibility: visible !important;
-}
-
+.mobile-menu-button:hover svg *,
 .mobile-menu-button:active svg *,
 .mobile-menu-button:focus svg * {
   opacity: 1 !important;
   transition: none !important;
   visibility: visible !important;
+  transform: none !important;
+  filter: none !important;
 }
 
 /* Even more specific overrides to ensure icon is always visible */
-button.mobile-menu-button svg {
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-}
-
-button.mobile-menu-button:hover svg {
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-}
-
-button.mobile-menu-button:active svg {
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-}
-
+button.mobile-menu-button svg,
+button.mobile-menu-button:hover svg,
+button.mobile-menu-button:active svg,
 button.mobile-menu-button:focus svg {
   opacity: 1 !important;
   visibility: visible !important;
   display: block !important;
+  transform: none !important;
+  filter: none !important;
 }
 
 /* Target the specific SVG paths to ensure they're always visible */
@@ -131,45 +111,40 @@ button.mobile-menu-button:focus svg {
   stroke-opacity: 1 !important;
   transition: none !important;
   fill: none !important;
+  stroke-width: 2 !important;
 }
 
-.mobile-menu-button:hover svg path {
-  opacity: 1 !important;
-  visibility: visible !important;
-  stroke-opacity: 1 !important;
-  transition: none !important;
-}
-
-.mobile-menu-button:active svg path {
-  opacity: 1 !important;
-  visibility: visible !important;
-  stroke-opacity: 1 !important;
-  transition: none !important;
-}
-
+/* Remove all possible path hover effects */
+.mobile-menu-button svg path:hover,
+.mobile-menu-button svg path:active,
+.mobile-menu-button svg path:focus,
+.mobile-menu-button:hover svg path,
+.mobile-menu-button:active svg path,
 .mobile-menu-button:focus svg path {
   opacity: 1 !important;
   visibility: visible !important;
   stroke-opacity: 1 !important;
   transition: none !important;
+  transform: none !important;
+  filter: none !important;
 }
 
 /* Ensure linear gradient is always applied */
-.mobile-menu-button svg path[stroke*="url"] {
-  stroke-opacity: 1 !important;
-}
-
-/* Additional overrides for all possible states */
+.mobile-menu-button svg path[stroke*="url"],
 .mobile-menu-button svg path[stroke*="url"]:hover,
 .mobile-menu-button svg path[stroke*="url"]:active,
 .mobile-menu-button svg path[stroke*="url"]:focus {
   stroke-opacity: 1 !important;
   opacity: 1 !important;
   visibility: visible !important;
+  transition: none !important;
 }
 
 /* Override any potential parent container effects */
-.md\:hidden .mobile-menu-button {
+.md\:hidden .mobile-menu-button,
+.md\:hidden .mobile-menu-button:hover,
+.md\:hidden .mobile-menu-button:active,
+.md\:hidden .mobile-menu-button:focus {
   display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
@@ -177,7 +152,13 @@ button.mobile-menu-button:focus svg {
 
 /* Ensure no parent container is hiding the button */
 header .mobile-menu-button,
-nav .mobile-menu-button {
+nav .mobile-menu-button,
+header .mobile-menu-button:hover,
+nav .mobile-menu-button:hover,
+header .mobile-menu-button:active,
+nav .mobile-menu-button:active,
+header .mobile-menu-button:focus,
+nav .mobile-menu-button:focus {
   opacity: 1 !important;
   visibility: visible !important;
   display: block !important;
@@ -185,19 +166,28 @@ nav .mobile-menu-button {
 
 /* Specific fix for mobile devices */
 @media (max-width: 768px) {
-  .mobile-menu-button {
+  .mobile-menu-button,
+  .mobile-menu-button:hover,
+  .mobile-menu-button:active,
+  .mobile-menu-button:focus {
     opacity: 1 !important;
     visibility: visible !important;
     display: block !important;
   }
   
-  .mobile-menu-button svg {
+  .mobile-menu-button svg,
+  .mobile-menu-button svg:hover,
+  .mobile-menu-button svg:active,
+  .mobile-menu-button svg:focus {
     opacity: 1 !important;
     visibility: visible !important;
     display: block !important;
   }
   
-  .mobile-menu-button svg path {
+  .mobile-menu-button svg path,
+  .mobile-menu-button svg path:hover,
+  .mobile-menu-button svg path:active,
+  .mobile-menu-button svg path:focus {
     opacity: 1 !important;
     visibility: visible !important;
     stroke-opacity: 1 !important;
