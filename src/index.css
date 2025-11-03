@@ -27,6 +27,27 @@
   -webkit-tap-highlight-color: transparent !important;
 }
 
+/* Ensure the mobile menu button icon always shows gradient */
+.mobile-menu-button svg {
+  background: linear-gradient(to right, #FF6B00, #2D6DF6) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  opacity: 1 !important;
+  transition: none !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Ensure the mobile menu button icon paths always show gradient */
+.mobile-menu-button svg * {
+  background: linear-gradient(to right, #FF6B00, #2D6DF6) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  stroke: none !important;
+}
+
 /* Completely remove all hover, active, and focus effects */
 .mobile-menu-button:hover,
 .mobile-menu-button:active,
@@ -182,6 +203,10 @@ nav .mobile-menu-button:focus {
     opacity: 1 !important;
     visibility: visible !important;
     display: block !important;
+    background: linear-gradient(to right, #FF6B00, #2D6DF6) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
   }
   
   .mobile-menu-button svg path,
@@ -191,6 +216,11 @@ nav .mobile-menu-button:focus {
     opacity: 1 !important;
     visibility: visible !important;
     stroke-opacity: 1 !important;
+    background: linear-gradient(to right, #FF6B00, #2D6DF6) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    stroke: none !important;
   }
 }
 

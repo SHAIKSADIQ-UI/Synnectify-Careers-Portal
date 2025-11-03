@@ -72,28 +72,19 @@ const Header = () => {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? (
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="none">
-                <defs>
-                  <linearGradient id="closeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#FF6B00" />
-                    <stop offset="100%" stopColor="#2D6DF6" />
-                  </linearGradient>
-                </defs>
-                <path d="M18 6L6 18" stroke="url(#closeGradient)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M6 6L18 18" stroke="url(#closeGradient)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <X className="w-6 h-6" style={{ 
+                background: 'linear-gradient(to right, #FF6B00, #2D6DF6)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }} />
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="none">
-                <defs>
-                  <linearGradient id="menuGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#FF6B00" />
-                    <stop offset="100%" stopColor="#2D6DF6" />
-                  </linearGradient>
-                </defs>
-                <path d="M3 12H21" stroke="url(#menuGradient)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M3 6H21" stroke="url(#menuGradient)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M3 18H21" stroke="url(#menuGradient)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <Menu className="w-6 h-6" style={{ 
+                background: 'linear-gradient(to right, #FF6B00, #2D6DF6)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }} />
             )}
           </button>
         </div>
