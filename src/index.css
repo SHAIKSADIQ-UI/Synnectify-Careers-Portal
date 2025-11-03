@@ -18,6 +18,8 @@
   transition: none !important;
   visibility: visible !important;
   display: block !important;
+  position: relative !important;
+  z-index: 9999 !important;
 }
 
 .mobile-menu-button:hover {
@@ -41,6 +43,14 @@
   display: block !important;
 }
 
+.mobile-menu-button:before {
+  display: none !important;
+}
+
+.mobile-menu-button:after {
+  display: none !important;
+}
+
 /* Ensure SVG icons inside mobile menu button are always visible */
 .mobile-menu-button svg {
   opacity: 1 !important;
@@ -49,6 +59,8 @@
   visibility: visible !important;
   fill: none !important;
   pointer-events: none !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .mobile-menu-button:hover svg {
@@ -118,6 +130,7 @@ button.mobile-menu-button:focus svg {
   visibility: visible !important;
   stroke-opacity: 1 !important;
   transition: none !important;
+  fill: none !important;
 }
 
 .mobile-menu-button:hover svg path {
@@ -153,6 +166,42 @@ button.mobile-menu-button:focus svg {
   stroke-opacity: 1 !important;
   opacity: 1 !important;
   visibility: visible !important;
+}
+
+/* Override any potential parent container effects */
+.md\:hidden .mobile-menu-button {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Ensure no parent container is hiding the button */
+header .mobile-menu-button,
+nav .mobile-menu-button {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* Specific fix for mobile devices */
+@media (max-width: 768px) {
+  .mobile-menu-button {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+  }
+  
+  .mobile-menu-button svg {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+  }
+  
+  .mobile-menu-button svg path {
+    opacity: 1 !important;
+    visibility: visible !important;
+    stroke-opacity: 1 !important;
+  }
 }
 
 body {
