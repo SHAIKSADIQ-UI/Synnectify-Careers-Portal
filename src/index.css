@@ -48,6 +48,37 @@
   visibility: visible !important;
 }
 
+/* Even more specific overrides to ensure icon is always visible */
+button.mobile-menu-button svg {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+button.mobile-menu-button:hover svg {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* Target the specific SVG paths to ensure they're always visible */
+.mobile-menu-button svg path {
+  opacity: 1 !important;
+  visibility: visible !important;
+  stroke-opacity: 1 !important;
+}
+
+.mobile-menu-button:hover svg path {
+  opacity: 1 !important;
+  visibility: visible !important;
+  stroke-opacity: 1 !important;
+}
+
+/* Ensure linear gradient is always applied */
+.mobile-menu-button svg path[stroke*="url"] {
+  stroke-opacity: 1 !important;
+}
+
 body {
   overflow-x: hidden;
 }
