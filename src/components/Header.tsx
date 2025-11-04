@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import UserProfile from "./UserProfile";
 
@@ -72,19 +71,47 @@ const Header = () => {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? (
-              <X className="w-6 h-6" style={{ 
-                background: 'linear-gradient(to right, #FF6B00, #2D6DF6)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-              }} />
+              // Custom X icon with gradient stroke
+              <svg 
+                className="w-6 h-6" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <defs>
+                  <linearGradient id="mobileIconGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#FF6B00" />
+                    <stop offset="100%" stopColor="#2D6DF6" />
+                  </linearGradient>
+                </defs>
+                <path 
+                  d="M6 6L18 18M6 18L18 6" 
+                  stroke="url(#mobileIconGradient)" 
+                  strokeWidth="2" 
+                  strokeLinecap="round"
+                />
+              </svg>
             ) : (
-              <Menu className="w-6 h-6" style={{ 
-                background: 'linear-gradient(to right, #FF6B00, #2D6DF6)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-              }} />
+              // Custom hamburger icon with gradient stroke
+              <svg 
+                className="w-6 h-6" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <defs>
+                  <linearGradient id="mobileIconGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#FF6B00" />
+                    <stop offset="100%" stopColor="#2D6DF6" />
+                  </linearGradient>
+                </defs>
+                <path 
+                  d="M4 6H20M4 12H20M4 18H20" 
+                  stroke="url(#mobileIconGradient)" 
+                  strokeWidth="2" 
+                  strokeLinecap="round"
+                />
+              </svg>
             )}
           </button>
         </div>
