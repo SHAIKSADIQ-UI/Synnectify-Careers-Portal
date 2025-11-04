@@ -31,13 +31,13 @@ const Footer = () => {
               Leading IT solutions provider specializing in digital transformation, web development, and innovative technology solutions.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#" className="text-gray-400 hover:text-white focus:text-white transition-colors">
                 <Linkedin className="w-5 h-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#" className="text-gray-400 hover:text-white focus:text-white transition-colors">
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#" className="text-gray-400 hover:text-white focus:text-white transition-colors">
                 <Twitter className="w-5 h-5" />
               </a>
             </div>
@@ -53,12 +53,12 @@ const Footer = () => {
   ['Mobile Applications', 'mobile-apps'],
   ['Digital Marketing', 'digital-marketing'],
   ['Branding', 'branding'],
-  ['Cloud & DevOps', 'cloud-devops'],
+  ['Product Photography', 'product-photography'],
 ].map(([label, anchor]) => (
   <li key={anchor}>
     <Link
       to={`/services#${anchor}`}
-      className="text-gray-400 hover:text-white transition-colors block"
+      className="text-gray-400 hover:text-white focus:text-white transition-colors block"
     >
       {label}
     </Link>
@@ -75,13 +75,13 @@ const Footer = () => {
                 ['Portfolio', '/portfolio'],
                 ['Contact', '/contact'],
                 ['Careers', '/careers'],
-                ['Blog', '/blog'],
-                ['Case Studies', '/case-studies'],
+                // ['Blog', '/blog'],
+                // ['Case Studies', '/case-studies'],
               ].map(([label, href]) => (
                 <li key={href}>
                   <Link
                     to={href}
-                    className="text-gray-400 hover:text-white transition-colors block"
+                    className="text-gray-400 hover:text-white focus:text-white transition-colors block"
                   >
                     {label}
                   </Link>
@@ -124,13 +124,13 @@ const Footer = () => {
               © 2024 SYNNECTIFY. All rights reserved.
             </p>
             <div className="flex flex-wrap justify-center md:justify-end items-center space-x-4">
-              <Link to="/privacy" className="text-gray-400 hover:text-white transition-colors">
+              <Link to="/privacy" className="text-gray-400 hover:text-white focus:text-white transition-colors">
                 Privacy Policy
               </Link>
-              <Link to="/terms" className="text-gray-400 hover:text-white transition-colors">
+              <Link to="/terms" className="text-gray-400 hover:text-white focus:text-white transition-colors">
                 Terms of Service
               </Link>
-              <Link to="/cookies" className="text-gray-400 hover:text-white transition-colors">
+              <Link to="/cookies" className="text-gray-400 hover:text-white focus:text-white transition-colors">
                 Cookie Policy
               </Link>
             </div>

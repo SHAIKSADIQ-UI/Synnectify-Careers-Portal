@@ -301,7 +301,7 @@ Please contact me to discuss further.`;
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-orange-500 text-white px-8 py-4 rounded-lg font-semibold hover:bg-orange-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    className="w-full bg-orange-500 text-white px-8 py-4 rounded-lg font-semibold hover:bg-orange-600 focus:bg-orange-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
                     {isSubmitting ? (
                       <>
@@ -354,9 +354,9 @@ Please contact me to discuss further.`;
                     <a
                       key={index}
                       href={social.url}
-                      className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-orange-100 to-blue-100 rounded-lg hover:from-orange-200 hover:to-blue-200 transition-all duration-300 group"
+                      className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-orange-100 to-blue-100 rounded-lg hover:from-orange-200 hover:to-blue-200 focus:from-orange-200 focus:to-blue-200 transition-all duration-300 group"
                     >
-                      <social.icon className="w-6 h-6 text-orange-600 group-hover:scale-110 transition-transform" />
+                      <social.icon className="w-6 h-6 text-orange-600 group-hover:scale-110 group-focus:scale-110 transition-transform" />
                     </a>
                   ))}
                 </div>
@@ -435,7 +435,7 @@ Please contact me to discuss further.`;
             </a>
             <Link
               to="/portfolio"
-              className="border-2 border-orange-500 text-orange-500 px-8 py-4 rounded-lg font-semibold hover:bg-orange-500 hover:text-white transition-all duration-300"
+              className="border-2 border-orange-500 text-orange-500 px-8 py-4 rounded-lg font-semibold hover:bg-orange-500 hover:text-white focus:bg-orange-500 focus:text-white transition-all duration-300"
             >
               See Our Work
             </Link>

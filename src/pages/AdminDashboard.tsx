@@ -490,7 +490,7 @@ const AdminDashboard = () => {
               )}
               <button
                 onClick={handleLogout}
-                className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-4 py-2 rounded-lg transition-all flex items-center gap-2 shadow-md hover:shadow-lg"
+                className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 focus:from-orange-700 focus:to-red-700 text-white px-4 py-2 rounded-lg transition-all flex items-center gap-2 shadow-md hover:shadow-lg focus:shadow-lg"
                 title="Logout"
               >
                 <LogOut className="w-4 h-4" />
@@ -605,7 +605,7 @@ const AdminDashboard = () => {
               className={`flex-1 px-6 py-4 text-center font-semibold transition-all relative ${
                 activeTab === "applications"
                   ? "text-orange-600 bg-orange-50"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 focus:text-gray-900 focus:bg-gray-50"
               }`}
             >
               {activeTab === "applications" && (
@@ -622,7 +622,7 @@ const AdminDashboard = () => {
               className={`flex-1 px-6 py-4 text-center font-semibold transition-all relative ${
                 activeTab === "jobs"
                   ? "text-orange-600 bg-orange-50"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 focus:text-gray-900 focus:bg-gray-50"
               }`}
             >
               {activeTab === "jobs" && (
@@ -648,7 +648,7 @@ const AdminDashboard = () => {
                   className={`px-4 py-2 rounded-lg font-medium transition-all ${
                     activeApplicationTab === "all"
                       ? "bg-orange-500 text-white shadow-md"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 focus:bg-gray-200"
                   }`}
                 >
                   ⏳ Pending Applications ({applications.filter(a => a.status === "Pending").length})
@@ -658,7 +658,7 @@ const AdminDashboard = () => {
                   className={`px-4 py-2 rounded-lg font-medium transition-all ${
                     activeApplicationTab === "shortlisted"
                       ? "bg-green-500 text-white shadow-md"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 focus:bg-gray-200"
                   }`}
                 >
                   ✅ Shortlisted Applications ({applications.filter(a => a.status === "Shortlisted").length})
@@ -668,7 +668,7 @@ const AdminDashboard = () => {
                   className={`px-4 py-2 rounded-lg font-medium transition-all ${
                     activeApplicationTab === "rejected"
                       ? "bg-red-500 text-white shadow-md"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 focus:bg-gray-200"
                   }`}
                 >
                   ❌ Rejected Applications ({applications.filter(a => a.status === "Rejected").length})
@@ -678,7 +678,7 @@ const AdminDashboard = () => {
                   className={`px-4 py-2 rounded-lg font-medium transition-all ${
                     activeApplicationTab === "ignored"
                       ? "bg-gray-500 text-white shadow-md"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 focus:bg-gray-200"
                   }`}
                 >
                   ⚙️ Ignored Applications ({applications.filter(a => a.status === "Ignored").length})
@@ -714,7 +714,7 @@ const AdminDashboard = () => {
                   {filteredApplications.map((app) => (
                     <div
                       key={app._id}
-                      className="border-2 border-gray-200 rounded-xl p-6 hover:shadow-xl hover:border-orange-300 transition-all bg-gradient-to-br from-white to-gray-50"
+                      className="border-2 border-gray-200 rounded-xl p-6 hover:shadow-xl hover:border-orange-300 focus:shadow-xl focus:border-orange-300 transition-all bg-gradient-to-br from-white to-gray-50"
                     >
                       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex-1">
@@ -759,7 +759,7 @@ const AdminDashboard = () => {
                         <div className="flex flex-wrap gap-2 mt-4 lg:mt-0 lg:ml-6">
                           <button
                             onClick={() => openApplicationModal(app)}
-                            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm flex items-center"
+                            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:bg-blue-600 transition-colors text-sm flex items-center"
                             title="View Application Details"
                           >
                             <Eye className="w-4 h-4 mr-1" />
@@ -829,7 +829,7 @@ const AdminDashboard = () => {
                                   e.preventDefault();
                                   openInterviewModal(app);
                                 }}
-                                className="px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-semibold flex items-center"
+                                className="px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 focus:bg-purple-600 transition-colors font-semibold flex items-center"
                               >
                                 <Calendar className="w-4 h-4 mr-2" />
                                 Schedule Interview

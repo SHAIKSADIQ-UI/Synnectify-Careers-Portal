@@ -747,6 +747,29 @@
 
 //   const currentService = services.find((service) => service.id === activeService);
 
+//   // Handle hash changes in URL for anchor scrolling
+//   useEffect(() => {
+//     const handleAnchorScroll = () => {
+//       if (location.hash) {
+//         const hash = location.hash.substring(1);
+//         const service = services.find(s => s.id === hash);
+//         if (service) {
+//           setActiveService(service.id);
+//           setTimeout(() => {
+//             const element = document.getElementById(`service-${hash}`);
+//             if (element) {
+//               element.scrollIntoView({ behavior: 'smooth' });
+//             }
+//           }, 100);
+//         }
+//       }
+//     };
+
+//     handleAnchorScroll();
+//     window.addEventListener('hashchange', handleAnchorScroll);
+//     return () => window.removeEventListener('hashchange', handleAnchorScroll);
+//   }, [location]);
+
 //   return (
 //     <>
 //       <Btn12Styles />
@@ -986,8 +1009,8 @@
 
 
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Palette,
@@ -1007,6 +1030,7 @@ import {
 
 const ServicesPage = () => {
   const [activeService, setActiveService] = useState('ui-ux');
+  const location = useLocation();
 
   const services = [
     {
@@ -1110,13 +1134,13 @@ const ServicesPage = () => {
       technologies: ['Adobe Creative Suite', 'Figma', 'Sketch', 'Canva Pro']
     },
     {
-      id: 'photography',
+      id: 'product-photography',
       icon: Camera,
-      title: 'Photography',
-      subtitle: 'Photography Services',
+      title: 'Product Photography',
+      subtitle: 'Products Photography Services',
       description:
         'Professional photography services with pre-shoot planning, high-res shoots, creative lighting, retouching, and event coverage.',
-      image: 'https://imgs.search.brave.com/jZEntI8sAG-l5nP5vM_xXyjVtRJnhZe61-Xg6xoWehU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzAzLzAyLzMwLzIw/LzM2MF9GXzMwMjMw/MjA5NF80ZUM0ajhv/SFhGU0VBRFdHSkUz/NmNIWlc2Vmt1b0Zq/ai5qcGc',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3MPQGm9q1EHoCltj6ES6F_V5gn9rRNmoxlw&s',
       features: [
         'Pre-shoot Planning & Consultation',
         'High-Resolution Photo Shoots',
@@ -1127,8 +1151,8 @@ const ServicesPage = () => {
         'Adobe Photoshop',
         'Brand Discovery & Research'
       ],
-      technologies: ['DJI Mavic', 'Phantom', 'SmugMug', 'Pixieset', 'Godox', 'Reflectors']
-    }
+      technologies: ['Godox', 'Reflectors', 'SmugMug', 'Canva Pro','DJI Mavic']
+    },
   ];
 
   const processSteps = [
@@ -1187,6 +1211,34 @@ const ServicesPage = () => {
 
   const currentService = services.find((service) => service.id === activeService);
 
+  // Handle hash changes in URL for anchor scrolling
+  useEffect(() => {
+    const handleAnchorScroll = () => {
+      if (location.hash) {
+        const hash = location.hash.substring(1);
+        const service = services.find(s => s.id === hash);
+        if (service) {
+          setActiveService(service.id);
+          setTimeout(() => {
+            const element = document.getElementById(`service-${hash}`);
+            if (element) {
+              element.scrollIntoView({ behavior: 'smooth' });
+            }
+          }, 100);
+        }
+      }
+    };
+
+    // Handle initial load with hash
+    handleAnchorScroll();
+    
+    // Handle hash changes
+    window.addEventListener('hashchange', handleAnchorScroll);
+    
+    // Cleanup listener
+    return () => window.removeEventListener('hashchange', handleAnchorScroll);
+  }, [location]);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section ------------------------------------------------ */}
@@ -1213,10 +1265,10 @@ const ServicesPage = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/contact"
-              className="bg-orange-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-orange-600 transition-all duration-300 inline-flex items-center justify-center group"
+              className="bg-orange-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-orange-600 focus:bg-orange-600 transition-all duration-300 inline-flex items-center justify-center group"
             >
               Get Free Consultation
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 group-focus:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
@@ -1246,7 +1298,7 @@ const ServicesPage = () => {
 
       {/* Service Detail --------------------------------------------- */}
       {currentService && (
-        <section className="py-20">
+        <section className="py-20" id={`service-${currentService.id}`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
               <div>
@@ -1278,10 +1330,10 @@ const ServicesPage = () => {
 
                 <Link
                   to="/contact"
-                  className="bg-orange-500 text-white px-8 py-3 mt-[-90px] rounded-lg font-semibold hover:bg-orange-600 transition-all duration-300 inline-flex items-center group"
+                  className="bg-orange-500 text-white px-8 py-3 mt-[-90px] rounded-lg font-semibold hover:bg-orange-600 focus:bg-orange-600 transition-all duration-300 inline-flex items-center group"
                 >
                   Get Started
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 group-focus:translate-x-1 transition-transform" />
                 </Link>
               </div>
 
@@ -1373,7 +1425,7 @@ const ServicesPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {whyChooseUs.map((item, index) => (
               <div key={index} className="text-center group">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-xl mb-6 group-hover:scale-110 transition-transform">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-xl mb-6 group-hover:scale-110 group-focus:scale-110 transition-transform">
                   <item.icon className="w-8 h-8 text-orange-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">{item.title}</h3>

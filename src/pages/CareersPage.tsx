@@ -193,9 +193,9 @@ const CareersPage = () => {
             {benefits.map((b, i) => (
               <div
                 key={i}
-                className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow group"
+                className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl focus:shadow-xl transition-shadow group"
               >
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-100 to-blue-100 rounded-xl mb-6 group-hover:scale-110 transition-transform">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-100 to-blue-100 rounded-xl mb-6 group-hover:scale-110 group-focus:scale-110 transition-transform">
                   <b.icon className="w-8 h-8 text-orange-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">{b.title}</h3>
@@ -226,7 +226,7 @@ const CareersPage = () => {
               jobs.map((job) => (
                 <div
                   key={job._id}
-                  className="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-lg transition-shadow"
+                  className="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-lg focus:shadow-lg transition-shadow"
                 >
                   <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                     <div className="flex-1">
@@ -303,13 +303,13 @@ const CareersPage = () => {
                         onClick={() =>
                           setSelectedJob(selectedJob === job._id ? null : job._id)
                         }
-                        className="border border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                        className="border border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 focus:bg-gray-50 transition-colors font-medium"
                       >
                         {selectedJob === job._id ? "Hide Details" : "View Details"}
                       </button>
                       <button
                         onClick={() => handleApplyClick(job._id, job.title)}
-                        className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-all duration-300 font-medium flex items-center justify-center"
+                        className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 focus:bg-orange-600 transition-all duration-300 font-medium flex items-center justify-center"
                       >
                         Apply Now
                         <Send className="ml-2 w-4 h-4" />

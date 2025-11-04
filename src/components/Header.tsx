@@ -52,7 +52,7 @@ const Header = () => {
               <Link
                 key={to}
                 to={to}
-                className={`text-white hover:text-orange-500 transition-colors font-bold text-lg shadow-sm ${
+                className={`text-white hover:text-orange-500 focus:text-orange-500 transition-colors font-bold text-lg shadow-sm ${
                   isActive(to) ? "text-orange-500" : ""
                 }`}
                 style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.3)' }}
@@ -118,7 +118,7 @@ const Header = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-white/20 text-center bg-black/10 hover:text-orange-500 backdrop-blur-sm py-4">
+          <div className="md:hidden border-t border-white/20 text-center bg-black/10 backdrop-blur-sm py-4">
             <div className="flex flex-col space-y-4">
               {[
                 "/",
@@ -131,8 +131,10 @@ const Header = () => {
                 <Link
                   key={path}
                   to={path}
-                  className="text-white hover:text-orange-500 transition-colors font-bold text-lg"
-                  style={{ textShadow: '1px 1px 2px rgba(17, 168, 238, 0.7)' }}
+                  className={`text-white hover:text-orange-500 focus:text-orange-500 active:text-orange-500 transition-colors duration-300 ease-in-out font-bold text-lg py-3 px-6 rounded-lg touch-manipulation mobile-nav-item ${
+                    isActive(path) ? "text-orange-500" : ""
+                  }`}
+                  style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.3)' }}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {path === "/"
