@@ -289,12 +289,13 @@ const JobApplicationForm = () => {
       });
 
       // Use the API URL from environment variables
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+      const API_URL = import.meta.env.VITE_API_URL || "https://synnectify-backend.onrender.com/api";
 
       // Try to submit to the correct API endpoint
       const response = await fetch(`${API_URL}/applications/apply`, {
         method: "POST",
         body: formDataToSend,
+        
       });
 
       console.log("Response status:", response.status);

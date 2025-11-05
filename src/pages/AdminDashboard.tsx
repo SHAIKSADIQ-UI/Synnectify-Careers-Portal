@@ -26,7 +26,7 @@ import {
   School,
 } from "lucide-react";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || "https://synnectify-backend.onrender.com/api";
 
 interface Job {
   _id: string;

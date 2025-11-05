@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Lock, Mail, Eye, EyeOff, Shield } from "lucide-react";
 
 // OTP IMPLEMENTATION START
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || "https://synnectify-backend.onrender.com/api";
 const ADMIN_EMAIL = "careers.synnectify@gmail.com";
 const ADMIN_PASSWORD = "Synnectify-Careers_2906";
 // OTP IMPLEMENTATION END
