@@ -47,7 +47,7 @@ function requireAdmin(req, res, next) {
 // Submit application
 router.post('/apply', upload.single('resume'), async (req, res) => {
   try {
-    console.log('Application submission received');
+    console.log('=== APPLICATION SUBMISSION START ===');
     console.log('Request body:', JSON.stringify(req.body, null, 2));
     console.log('File upload:', req.file);
     
@@ -81,41 +81,52 @@ router.post('/apply', upload.single('resume'), async (req, res) => {
       position
     } = req.body;
     
+    console.log('Extracted data:', { jobId, name, email, firstName, lastName, phone, position });
+    
     // Support both jobId (from dashboard) and position (from careers page direct apply)
     let job = null;
     let jobTitle = position || 'General Position';
     let finalJobId = null;
     
     if (jobId && jobId !== 'undefined' && jobId !== 'null') {
+      console.log('Looking up job by ID:', jobId);
       job = await Job.findById(jobId);
       if (!job) {
-        console.log(`Job with ID ${jobId} not found`);
+        console.log(`⚠️ Job with ID ${jobId} not found`);
       } else {
         jobTitle = job.title;
         finalJobId = job._id;
+        console.log('✅ Found job by ID:', jobTitle);
       }
     } else if (position) {
       // Try to find job by title
+      console.log('Looking up job by title:', position);
       job = await Job.findOne({ title: position });
       if (job) {
         finalJobId = job._id;
         jobTitle = job.title;
-        console.log(`Found job by title: ${jobTitle}`);
+        console.log('✅ Found job by title:', jobTitle);
       } else {
-        console.log(`No job found with title: ${position}`);
+        console.log(`⚠️ No job found with title: ${position}`);
       }
     }
 
     const fullName = firstName && lastName ? `${firstName} ${lastName}` : name;
     const applicantEmail = email;
     
+    console.log('Full name:', fullName);
+    console.log('Applicant email:', applicantEmail);
+    
     if (!fullName || !applicantEmail) {
+      console.log('❌ Missing required fields: name or email');
       return res.status(400).json({ error: 'Name and email are required' });
     }
 
     const resumePath = req.file ? `/uploads/${req.file.filename}` : undefined;
+    console.log('Resume path:', resumePath);
     
     // Create application record with all fields
+    console.log('Creating application record...');
     const appDoc = await Application.create({ 
       jobId: finalJobId,
       position: jobTitle, // ✅ Store the position name
@@ -143,7 +154,7 @@ router.post('/apply', upload.single('resume'), async (req, res) => {
       linkedin: linkedin || ''
     });
     
-    console.log(`Application created: ${appDoc._id} for ${jobTitle}`);
+    console.log(`✅ Application created successfully: ${appDoc._id} for ${jobTitle}`);
 
     // === EMAIL 1: Send to careers.synnectify@gmail.com (Company Notification) ===
     const companyEmail = 'careers.synnectify@gmail.com';
@@ -292,10 +303,12 @@ router.post('/apply', upload.single('resume'), async (req, res) => {
       console.error('⚠️ Failed to send applicant email, but application saved:', emailError.message);
     }
 
+    console.log('=== APPLICATION SUBMISSION COMPLETE ===');
     res.status(201).json({ message: 'Application submitted successfully', application: appDoc });
   } catch (err) {
-    console.error('Application submission error:', err);
+    console.error('❌ Application submission error:', err);
     console.error('Error details:', err.message);
+    console.error('Stack trace:', err.stack);
     res.status(500).json({ error: 'Server error. Please try again later.', details: err.message });
   }
 });
