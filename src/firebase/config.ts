@@ -4,16 +4,15 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Use environment variables for Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAm7_aWUexpAyBEJlOj2hTHMbEXIrDF4Dw",
-  authDomain: "synnectify-63e1d.firebaseapp.com",
-  projectId: "synnectify-63e1d",
-  storageBucket: "synnectify-63e1d.firebasestorage.app",
-  messagingSenderId: "982221510813",
-  appId: "1:982221510813:web:54245bd65f5294e8e69c74",
-  measurementId: "G-ZDV7H6MEQL"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
