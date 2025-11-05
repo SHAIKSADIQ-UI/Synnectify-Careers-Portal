@@ -21,12 +21,13 @@ const allowedOrigins = [
   process.env.CLIENT_URL,
   'http://localhost:5173',
   'http://localhost:5174',
-  'http://localhost:5175'
+  'http://localhost:5175',
+  'https://synnectify-careers-portal.vercel.app' // Add Vercel frontend URL explicitly
 ].filter(Boolean);
 
 // In production, only allow specific domains
 if (process.env.NODE_ENV === 'production') {
-  console.log('🔒 Production mode: CORS restricted to:', process.env.CLIENT_URL);
+  console.log('🔒 Production mode: CORS restricted to:', allowedOrigins.filter(Boolean));
 }
 
 app.use(
@@ -35,11 +36,19 @@ app.use(
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
       
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg = `The CORS policy for this site does not allow access from the specified origin: ${origin}`;
-        return callback(new Error(msg), false);
+      // Check if origin is in allowed list
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
       }
-      return callback(null, true);
+      
+      // In development, be more permissive
+      if (process.env.NODE_ENV === 'development') {
+        console.log('⚠️  Development mode: Allowing origin', origin);
+        return callback(null, true);
+      }
+      
+      const msg = `The CORS policy for this site does not allow access from the specified origin: ${origin}`;
+      return callback(new Error(msg), false);
     },
     credentials: true,
   })
