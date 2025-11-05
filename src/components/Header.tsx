@@ -53,7 +53,7 @@ const Header = () => {
               <Link
                 key={to}
                 to={to}
-                className={`text-white hover:text-orange-500 transition-colors font-bold text-lg shadow-sm ${
+                className={`text-white hover:text-orange-500 focus:text-orange-500 transition-colors font-bold text-lg shadow-sm ${
                   isActive(to) ? "text-orange-500" : ""
                 }`}
                 style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.3)' }}
@@ -66,22 +66,29 @@ const Header = () => {
             {user && <UserProfile />}
           </nav>
 
-          {/* Mobile Toggle */}
-          <button
-            className="md:hidden p-2"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? (
-              <X className="w-6 h-6 text-white" />
-            ) : (
-              <Menu className="w-6 h-6 text-white" />
-            )}
-          </button>
+          {/* Mobile Navigation - Always show user profile and menu toggle */}
+          <div className="flex items-center md:hidden">
+            {/* User Profile (only show when logged in) */}
+            {user && <UserProfile />}
+            
+            {/* Mobile Toggle */}
+            <button
+              className="p-2 ml-2"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            >
+              {isMenuOpen ? (
+                <X className="w-6 h-6 text-white" />
+              ) : (
+                <Menu className="w-6 h-6 text-white" />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-white/20 text-center bg-black/10 hover:text-orange-500 backdrop-blur-sm py-4">
+          <div className="md:hidden border-t border-white/20 text-center bg-black/10 backdrop-blur-sm py-4">
             <div className="flex flex-col space-y-4">
               {[
                 "/",
@@ -94,7 +101,9 @@ const Header = () => {
                 <Link
                   key={path}
                   to={path}
-                  className="text-white hover:text-orange-500 transition-colors font-bold text-lg"
+                  className={`text-white hover:text-orange-500 focus:text-orange-500 active:text-orange-500 transition-colors font-bold text-lg ${
+                    isActive(path) ? "text-orange-500" : ""
+                  }`}
                   style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.3)' }}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -104,12 +113,6 @@ const Header = () => {
                       path.slice(2)}
                 </Link>
               ))}
-              {/* User Profile (only show when logged in) */}
-              {user && (
-                <div className="flex justify-center">
-                  <UserProfile />
-                </div>
-              )}
             </div>
           </div>
         )}
