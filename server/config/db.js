@@ -8,9 +8,8 @@ async function connectDB() {
   }
   
   // Add connection options for better reliability
+  // Removed deprecated options: useNewUrlParser and useUnifiedTopology
   const options = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
     serverSelectionTimeoutMS: 30000, // Increase timeout to 30 seconds
     socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
   };

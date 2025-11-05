@@ -48,6 +48,23 @@ app.use(
 // Static serving of uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Root route - API Information
+app.get('/', (req, res) => {
+  res.status(200).json({ 
+    message: 'SYNNECTIFY Careers Portal API',
+    version: '1.0.0',
+    status: 'active',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    documentation: '/api/docs (not yet implemented)',
+    endpoints: {
+      auth: '/api/auth',
+      jobs: '/api/jobs',
+      applications: '/api/applications'
+    }
+  });
+});
+
 // Health check
 app.get('/api/ping', (req, res) => {
   res.status(200).json({ 
@@ -61,6 +78,21 @@ app.get('/api/ping', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
+
+// 404 handler for undefined routes
+app.use('*', (req, res) => {
+  res.status(404).json({ 
+    error: 'Route not found',
+    message: `Cannot ${req.method} ${req.originalUrl}`,
+    availableEndpoints: [
+      'GET /',
+      'GET /api/ping',
+      'POST /api/auth/*',
+      'GET /api/jobs/*',
+      'POST /api/applications/*'
+    ]
+  });
+});
 
 // DB and server start
 const PORT = process.env.PORT || 5000;
