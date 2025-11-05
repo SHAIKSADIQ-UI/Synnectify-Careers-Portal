@@ -75,8 +75,8 @@ const Footer = () => {
                 ['Portfolio', '/portfolio'],
                 ['Contact', '/contact'],
                 ['Careers', '/careers'],
-                ['Blog', '/blog'],
-                ['Case Studies', '/case-studies'],
+                // ['Blog', '/blog'],
+                // ['Case Studies', '/case-studies'],
               ].map(([label, href]) => (
                 <li key={href}>
                   <Link
