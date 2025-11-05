@@ -14,7 +14,7 @@ const applicationRoutes = require('./routes/applications');
 const app = express();
 
 // Middleware
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 // CORS Configuration
 const allowedOrigins = [

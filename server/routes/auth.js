@@ -53,23 +53,37 @@ router.post('/google', async (req, res) => {
 // Admin login step 1: Verify credentials and send OTP
 router.post('/admin-login', async (req, res) => {
   try {
-    console.log('Admin login request received');
+    console.log('=== ADMIN LOGIN ATTEMPT ===');
+    console.log('Request headers:', req.headers);
     console.log('Request body:', JSON.stringify(req.body, null, 2));
+    console.log('Content type:', req.headers['content-type']);
+    
+    // Check if body exists and is parsed correctly
+    if (!req.body) {
+      console.log('❌ No request body received');
+      return res.status(400).json({ error: 'No request body received' });
+    }
     
     const { email, password } = req.body;
     
+    console.log('Extracted email:', email);
+    console.log('Extracted password:', password ? 'PROVIDED' : 'MISSING');
+    
     if (!email || !password) {
+      console.log('❌ Email or password missing');
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
     // Check if email is the allowed admin email
     // OTP IMPLEMENTATION START
     if (email !== 'careers.synnectify@gmail.com') {
+      console.log('❌ Unauthorized email:', email);
       return res.status(403).json({ error: 'Access denied. Only careers.synnectify@gmail.com can access admin panel.' });
     }
 
     // Check if password matches the fixed admin password
     if (password !== 'Synnectify-Careers_2906') {
+      console.log('❌ Invalid password');
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
