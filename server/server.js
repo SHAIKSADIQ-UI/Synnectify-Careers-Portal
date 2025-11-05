@@ -79,7 +79,22 @@ app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
 
-// 404 handler for undefined routes - Fixed to use proper Express syntax
+// 404 handler for undefined routes - Using explicit path matching
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ 
+    error: 'API Route not found',
+    message: `Cannot ${req.method} ${req.originalUrl}`,
+    availableEndpoints: [
+      'GET /',
+      'GET /api/ping',
+      'POST /api/auth/*',
+      'GET /api/jobs/*',
+      'POST /api/applications/*'
+    ]
+  });
+});
+
+// Catch-all handler for non-API routes
 app.use((req, res) => {
   res.status(404).json({ 
     error: 'Route not found',
