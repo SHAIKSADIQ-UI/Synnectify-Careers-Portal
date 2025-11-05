@@ -17,7 +17,33 @@ import {
   Globe,
 } from "lucide-react";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+// Determine API URL based on environment
+const getApiUrl = () => {
+  // If VITE_API_URL is explicitly set, use it
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // In development, use localhost
+  if (import.meta.env.DEV) {
+    return "http://localhost:5000/api";
+  }
+  
+  // In production, try to infer the backend URL
+  // Common pattern: if frontend is on Vercel, backend might be on Render
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname.includes('vercel.app')) {
+      // Try the common Render URL pattern
+      return "https://synnectify-careers-portal.onrender.com/api";
+    }
+  }
+  
+  // Fallback
+  return "http://localhost:5000/api";
+};
+
+const API_URL = getApiUrl();
 
 interface Job {
   _id: string;
