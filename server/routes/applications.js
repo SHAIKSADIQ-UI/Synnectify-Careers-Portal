@@ -47,6 +47,10 @@ function requireAdmin(req, res, next) {
 // Submit application
 router.post('/apply', upload.single('resume'), async (req, res) => {
   try {
+    console.log('Application submission received');
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+    console.log('File upload:', req.file);
+    
     // Extract all form fields
     const {
       jobId,
@@ -229,6 +233,7 @@ router.post('/apply', upload.single('resume'), async (req, res) => {
     
     // Try to send emails, but don't fail the application if emails fail
     try {
+      console.log('Sending company notification email to:', companyEmail);
       await sendEmail(companyEmail, companySubject, companyHtml);
       console.log('✅ Company notification email sent');
     } catch (emailError) {
@@ -280,6 +285,7 @@ router.post('/apply', upload.single('resume'), async (req, res) => {
     `;
     
     try {
+      console.log('Sending applicant confirmation email to:', applicantEmail);
       await sendEmail(applicantEmail, applicantSubject, applicantHtml);
       console.log('✅ Applicant confirmation email sent');
     } catch (emailError) {

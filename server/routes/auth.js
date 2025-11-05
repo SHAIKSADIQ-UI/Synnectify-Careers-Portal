@@ -104,6 +104,13 @@ router.post('/admin-login', async (req, res) => {
     // Send OTP via email
     try {
       console.log('Attempting to send OTP email to:', email);
+      console.log('Email configuration check:', {
+        EMAIL_USER: process.env.EMAIL_USER,
+        EMAIL_PASS: process.env.EMAIL_PASS ? 'SET' : 'MISSING',
+        SMTP_HOST: process.env.SMTP_HOST,
+        SMTP_PORT: process.env.SMTP_PORT
+      });
+      
       const emailResult = await sendEmail(
         email,
         'Admin Panel Login - OTP Verification',
