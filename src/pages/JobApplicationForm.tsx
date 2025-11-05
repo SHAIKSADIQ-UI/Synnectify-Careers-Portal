@@ -183,6 +183,7 @@ const JobApplicationForm = () => {
   useEffect(() => {
     if (showSuccessModal) {
       const timer = setTimeout(() => {
+        setShowSuccessModal(false);
         navigate("/dashboard");
       }, 2000);
       

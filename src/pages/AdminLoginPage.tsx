@@ -26,6 +26,7 @@ const AdminLoginPage = () => {
     setLoading(true);
 
     try {
+      console.log('Attempting admin login with:', { email, password });
       const response = await fetch(`${API_URL}/auth/admin-login`, {
         method: "POST",
         headers: {
@@ -34,7 +35,9 @@ const AdminLoginPage = () => {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log('Login response status:', response.status);
       const data = await response.json();
+      console.log('Login response data:', data);
 
       if (!response.ok) {
         throw new Error(data.error || "Login failed");
@@ -57,6 +60,7 @@ const AdminLoginPage = () => {
         navigate("/admin");
       }
     } catch (err) {
+      console.error('Login error:', err);
       setError(err instanceof Error ? err.message : "Login failed. Please check your credentials.");
     } finally {
       setLoading(false);
@@ -70,6 +74,7 @@ const AdminLoginPage = () => {
     setLoading(true);
 
     try {
+      console.log('Verifying OTP with:', { email, otp });
       const response = await fetch(`${API_URL}/auth/admin-verify-otp`, {
         method: "POST",
         headers: {
@@ -78,7 +83,9 @@ const AdminLoginPage = () => {
         body: JSON.stringify({ email, otp }),
       });
 
+      console.log('OTP verification response status:', response.status);
       const data = await response.json();
+      console.log('OTP verification response data:', data);
 
       if (!response.ok) {
         throw new Error(data.error || "OTP verification failed");
@@ -95,6 +102,7 @@ const AdminLoginPage = () => {
       // Redirect to admin dashboard
       navigate("/admin");
     } catch (err) {
+      console.error('OTP verification error:', err);
       setError(err instanceof Error ? err.message : "OTP verification failed.");
     } finally {
       setLoading(false);
@@ -107,6 +115,7 @@ const AdminLoginPage = () => {
     setLoading(true);
 
     try {
+      console.log('Resending OTP for:', email);
       const response = await fetch(`${API_URL}/auth/admin-login`, {
         method: "POST",
         headers: {
@@ -115,7 +124,9 @@ const AdminLoginPage = () => {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log('Resend OTP response status:', response.status);
       const data = await response.json();
+      console.log('Resend OTP response data:', data);
 
       if (!response.ok) {
         throw new Error(data.error || "Failed to resend OTP");
@@ -123,6 +134,7 @@ const AdminLoginPage = () => {
 
       setSuccess(data.message);
     } catch (err) {
+      console.error('Resend OTP error:', err);
       setError(err instanceof Error ? err.message : "Failed to resend OTP.");
     } finally {
       setLoading(false);
