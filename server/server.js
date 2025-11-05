@@ -80,5 +80,11 @@ connectDB()
   })
   .catch((err) => {
     console.error('❌ Failed to connect to DB:', err);
+    console.error('🔧 Troubleshooting steps:');
+    console.error('1. Check if MONGO_URI is correctly set in your .env file');
+    console.error('2. Ensure your IP is whitelisted in MongoDB Atlas');
+    console.error('3. Verify MongoDB Atlas cluster is active and accessible');
+    console.error('4. Check network connectivity');
+    console.error('Refer to MongoDB Atlas documentation for IP whitelist configuration.');
     process.exit(1);
   });

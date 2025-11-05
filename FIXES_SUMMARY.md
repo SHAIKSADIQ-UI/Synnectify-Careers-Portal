@@ -86,7 +86,7 @@
 - Component has proper fallback mechanism
 
 **Current Implementation**:
-```typescript
+``typescript
 // UserProfile.tsx
 {user.photo ? (
   <img
