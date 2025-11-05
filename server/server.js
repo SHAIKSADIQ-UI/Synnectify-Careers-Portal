@@ -99,7 +99,13 @@ app.get('/api/test-email', async (req, res) => {
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
       return res.status(400).json({ 
         error: 'Email configuration incomplete',
-        details: 'EMAIL_USER and EMAIL_PASS must be set in environment variables'
+        details: 'EMAIL_USER and EMAIL_PASS must be set in environment variables',
+        envCheck: {
+          EMAIL_USER: process.env.EMAIL_USER ? 'SET' : 'MISSING',
+          EMAIL_PASS: process.env.EMAIL_PASS ? 'SET' : 'MISSING',
+          SMTP_HOST: process.env.SMTP_HOST || 'DEFAULT',
+          SMTP_PORT: process.env.SMTP_PORT || 'DEFAULT'
+        }
       });
     }
     
@@ -126,9 +132,30 @@ app.get('/api/test-email', async (req, res) => {
     console.error('Email test failed:', error);
     res.status(500).json({ 
       error: 'Email test failed',
-      details: error.message 
+      details: error.message,
+      code: error.code
     });
   }
+});
+
+// Environment variables check endpoint
+app.get('/api/env-check', (req, res) => {
+  const envVars = {
+    EMAIL_USER: process.env.EMAIL_USER ? 'SET' : 'MISSING',
+    EMAIL_PASS: process.env.EMAIL_PASS ? 'SET' : 'MISSING',
+    EMAIL_FROM: process.env.EMAIL_FROM || 'NOT SET',
+    EMAIL_REPLY_TO: process.env.EMAIL_REPLY_TO || 'NOT SET',
+    SMTP_HOST: process.env.SMTP_HOST || 'DEFAULT',
+    SMTP_PORT: process.env.SMTP_PORT || 'DEFAULT',
+    NODE_ENV: process.env.NODE_ENV || 'development'
+  };
+  
+  console.log('Environment variables check:', envVars);
+  
+  res.json({
+    message: 'Environment variables status',
+    envVars
+  });
 });
 
 // Routes

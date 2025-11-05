@@ -25,6 +25,14 @@ const transporter = nodemailer.createTransport({
  * @returns {Promise} - Email sending result
  */
 async function sendEmail(to, subject, html, replyTo = null) {
+  console.log('=== EMAIL CONFIGURATION CHECK ===');
+  console.log('EMAIL_USER:', process.env.EMAIL_USER ? 'SET' : 'MISSING');
+  console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? 'SET' : 'MISSING');
+  console.log('EMAIL_FROM:', process.env.EMAIL_FROM || 'NOT SET');
+  console.log('EMAIL_REPLY_TO:', process.env.EMAIL_REPLY_TO || 'NOT SET');
+  console.log('SMTP_HOST:', process.env.SMTP_HOST || 'DEFAULT');
+  console.log('SMTP_PORT:', process.env.SMTP_PORT || 'DEFAULT');
+  
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     console.warn('⚠️ EMAIL_USER or EMAIL_PASS not configured. Skipping email send.');
     console.warn('📧 Would have sent email to:', to);
@@ -55,6 +63,14 @@ async function sendEmail(to, subject, html, replyTo = null) {
       }
     };
     
+    console.log('📧 Attempting to send email with options:', {
+      from: fromAddress,
+      to,
+      subject,
+      hasHtml: !!html,
+      replyTo: replyToAddress
+    });
+    
     const info = await transporter.sendMail(mailOptions);
     
     console.log(`✅ Email sent successfully to ${to}`);
@@ -66,6 +82,8 @@ async function sendEmail(to, subject, html, replyTo = null) {
     console.error('❌ Email sending failed:', error.message);
     console.error('📧 Recipient:', to);
     console.error('📧 Subject:', subject);
+    console.error('📧 Error code:', error.code);
+    console.error('📧 Error stack:', error.stack);
     
     // Provide helpful error messages
     if (error.code === 'EAUTH') {
