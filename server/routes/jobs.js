@@ -28,6 +28,7 @@ function requireAdmin(req, res, next) {
 // GET all jobs
 router.get('/', async (_req, res) => {
   try {
+    console.log('Fetching jobs from database...');
     // Use Mongoose model to fetch jobs
     const jobs = await Job.find({}).sort({ createdAt: -1 });
     
@@ -35,6 +36,12 @@ router.get('/', async (_req, res) => {
     if (jobs.length > 0) {
       console.log(`First job requirements:`, jobs[0].requirements ? jobs[0].requirements.length : 0);
       console.log(`First job responsibilities:`, jobs[0].responsibilities ? jobs[0].responsibilities.length : 0);
+      console.log('First job:', JSON.stringify(jobs[0], null, 2));
+    } else {
+      console.log('No jobs found in database');
+      // Let's also check if there are any jobs at all
+      const count = await Job.countDocuments({});
+      console.log(`Total jobs in collection: ${count}`);
     }
     
     res.json(jobs);

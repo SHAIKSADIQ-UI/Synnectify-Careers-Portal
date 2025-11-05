@@ -15,7 +15,7 @@ const PortfolioPage = () => {
         "https://i.ibb.co/sJPc8w0G/520a6aad-269e-4179-a7fb-b4e0028e2e55.jpg",
       description:
         "Online food store offering fresh products, secure checkout, fast delivery, and easy order tracking.",
-      technologies: ["HTML/CSS", "JavaScript", "Bootstrap", "API Integration"],
+      // technologies: ["HTML/CSS", "JavaScript", "Bootstrap", "API Integration"],
       results: [
         "300% faster load times",
         "150% increase in conversions",
@@ -33,7 +33,7 @@ const PortfolioPage = () => {
         "https://i.ibb.co/cSqGf7q5/a6b8c92f-e169-4cdc-9f47-e1a0c0392024.jpg",
       description:
         "Engineering consulting firm offering design, project management, and innovative technical solutions.",
-      technologies: ["React Native", "Firebase", "WebRTC", "Techical"],
+      // technologies: ["React Native", "Firebase", "WebRTC", "Techical"],
       results: ["100K+ downloads", "4.8 star rating", "HIPAA compliant"],
       liveUrl: "https://www.odcet.com/",
       featured: true,
@@ -47,7 +47,7 @@ const PortfolioPage = () => {
         "https://i.ibb.co/sJmWtZDY/3a6e7d13-8736-4407-b191-30b1d5c5aff5.jpg",
       description:
         "Compassionate home care services, skilled nursing, personal assistance, and senior health support.",
-      technologies: ["Vue.js", "Python", "PostgreSQL", "D3.js", "Docker"],
+      // technologies: ["Vue.js", "Python", "PostgreSQL", "D3.js", "Docker"],
       results: [
         "Real-time data processing",
         "Advanced analytics",
@@ -65,14 +65,14 @@ const PortfolioPage = () => {
         "https://i.ibb.co/svf7X3gQ/3acf8cff-0a72-4930-a256-768fda54138c.jpg",
       description:
         "Creative branding agency delivering design, brand strategy, and digital marketing for business growth.",
-      technologies: [
-        "Cloud Computing",
-        "AWS",
-        "Microsoft Azure",
-        "DevOps Tools",
-        "React.js",
-        "Node.js",
-      ],
+      // technologies: [
+      //   "Cloud Computing",
+      //   "AWS",
+      //   "Microsoft Azure",
+      //   "DevOps Tools",
+      //   "React.js",
+      //   "Node.js",
+      // ],
       results: [
         "Brand recognition increased",
         "Consistent visual identity",
@@ -81,31 +81,31 @@ const PortfolioPage = () => {
       liveUrl: "https://rudraatech.com/",
       featured: false,
     },
-    {
-      id: 5,
-      title: "Synnectify Technologies",
-      category: "mobile",
-      client: "Synnectify",
-      image: "https://i.ibb.co/Xkrd5N1J/image.png",
-      description:
-        "Innovative tech solutions for business growth, digital transformation, and superior user experience.",
-      technologies: [
-        "React.js",
-        "TypeScript",
-        "Google Maps API",
-        "Tailwind CSS",
-        "Node.js",
-        "Vite.js",
-        "PostCSS",
-      ],
-      results: [
-        "50K+ active users",
-        "Real-time tracking",
-        "Multi-browser support",
-      ],
-      liveUrl: "#",
-      featured: true,
-    },
+    // {
+    //   id: 5,
+    //   title: "Synnectify Technologies",
+    //   category: "mobile",
+    //   client: "Synnectify",
+    //   image: "https://i.ibb.co/Xkrd5N1J/image.png",
+    //   description:
+    //     "Innovative tech solutions for business growth, digital transformation, and superior user experience.",
+    //   technologies: [
+    //     "React.js",
+    //     "TypeScript",
+    //     "Google Maps API",
+    //     "Tailwind CSS",
+    //     "Node.js",
+    //     "Vite.js",
+    //     "PostCSS",
+    //   ],
+    //   results: [
+    //     "50K+ active users",
+    //     "Real-time tracking",
+    //     "Multi-browser support",
+    //   ],
+    //   liveUrl: "#",
+    //   featured: true,
+    // },
     {
       id: 6,
       title: "Global Interworks Solutions",
@@ -115,7 +115,7 @@ const PortfolioPage = () => {
         "https://i.ibb.co/Z6wCYJ3F/ba6bd06b-5bf8-4cad-80c2-c30ee33f8a61.jpg",
       description:
         "Online training platform with video courses, skill assessments, progress tracking, and certifications.",
-      technologies: ["React", "Node.js", "MongoDB", "Video.js", "Socket.io"],
+      // technologies: ["React", "Node.js", "MongoDB", "Video.js", "Socket.io"],
       results: [
         "10K+ students enrolled",
         "Interactive learning",
@@ -131,15 +131,15 @@ const PortfolioPage = () => {
       client: "Synnectify",
       image: "https://i.ibb.co/DTX51b6/1fb42c03-d54b-458c-8cd8-1779bbf49abe.jpg",
       description: "IT solutions provider offering web development, cloud services, mobile apps, and digital marketing.",
-      technologies: [
-          'Web Development Frameworks',
-          'Cloud Platforms',
-          'Mobile App Development',
-          'API Integration',
-          'DevOps Tools',
-          'UI/UX Design',
-          'Digital Marketing Tools'
-      ],
+      // // technologies: [
+      // //     'Web Development Frameworks',
+      // //     'Cloud Platforms',
+      // //     'Mobile App Development',
+      // //     'API Integration',
+      // //     'DevOps Tools',
+      // //     'UI/UX Design',
+      // //     'Digital Marketing Tools'
+      // ],
       results: [
           'Accelerated project delivery',
           'Improved client ROI',
@@ -159,15 +159,15 @@ const PortfolioPage = () => {
       image: "https://media.istockphoto.com/id/1200700846/photo/selective-focus-of-photographer-taking-photo-of-model-and-hairstylist.jpg?b=1&s=612x612&w=0&k=20&c=IEZpsgLhnGfuOTUh2Pb0GrFMbhwN1qgAFS9fBxKIJmk=",
       description:
         "Photography captures moments, tells stories, and preserves memories through creative visual expression",
-      technologies: [
-        "Adobe Photoshop",
-        "Adobe Lightroom",
-        "Canon EOS R5",
-        "Nikon Z7 II",
-        "DJI Mavic Air 2",
-        "Capture One",
-        "SmugMug",
-      ],
+      // technologies: [
+      //   "Adobe Photoshop",
+      //   "Adobe Lightroom",
+      //   "Canon EOS R5",
+      //   "Nikon Z7 II",
+      //   "DJI Mavic Air 2",
+      //   "Capture One",
+      //   "SmugMug",
+      // ],
       results: [
         "500+ high-quality images delivered",
         "Client satisfaction rate 98%",
@@ -185,12 +185,12 @@ const PortfolioPage = () => {
         "https://i.ibb.co/FftVfCv/f4d0df8e-0b95-46d8-9f42-56707bb583e2.jpg",
       description:
         "Creative branding agency delivering design, brand strategy, and digital marketing for business growth.",
-      technologies: [
-        "CRM Platforms",
-        "Secure Payment Gateways",
-        "API Integration",
-        "Data Encryption",
-      ],
+      // technologies: [
+      //   "CRM Platforms",
+      //   "Secure Payment Gateways",
+      //   "API Integration",
+      //   "Data Encryption",
+      // ],
       results: [
         "Faster policy processing",
         "Improved customer retention",
@@ -209,15 +209,15 @@ const PortfolioPage = () => {
         "https://i.ibb.co/Q3sR9g9v/21433b34-f78a-402e-9f36-fd3f9c9f9f6d.jpg",
       description:
         "Online tax filing platform with secure e-filing, refund tracking, expert support, and data protection.",
-      technologies: [
-        "E-filing Systems",
-        "SSL Encryption",
-        "User Authentication",
-        "Cloud Storage",
-        "Automated Tax Calculators",
-        "Customer Support Chatbots",
-        "Data Backup Solutions",
-      ],
+      // technologies: [
+      //   "E-filing Systems",
+      //   "SSL Encryption",
+      //   "User Authentication",
+      //   "Cloud Storage",
+      //   "Automated Tax Calculators",
+      //   "Customer Support Chatbots",
+      //   "Data Backup Solutions",
+      // ],
       results: [
         'Faster tax return processing',
         'Increased user satisfaction',
@@ -229,25 +229,25 @@ const PortfolioPage = () => {
       liveUrl: "https://myonlinetaxreturn.com/index.html",
       featured: false,
     },
-    {
-      id: 11,
-      title: "JRavah Foods",
-      category: "marketing",
-      client: "JRavah Foods",
-      image:
-        "https://i.ibb.co/sJPc8w0G/520a6aad-269e-4179-a7fb-b4e0028e2e55.jpg",
-      description: "Organic mushroom farming brand delivering fresh, pure, and quality produce across Telugu states.",
-      technologies: ["HTML/CSS", "JavaScript", "Bootstrap", "API Integration"],
-      results: [
-        'Expanded market reach',
-        'Consistent product quality',
-        'Faster delivery times',
-        'Increased customer trust',
-        'Higher yield per harvest'
-      ],
-      liveUrl: "https://jravahfoods.com/index.html",
-      featured: false,
-    },
+    // {
+    //   id: 11,
+    //   title: "JRavah Foods",
+    //   category: "marketing",
+    //   client: "JRavah Foods",
+    //   image:
+    //     "https://i.ibb.co/sJPc8w0G/520a6aad-269e-4179-a7fb-b4e0028e2e55.jpg",
+    //   description: "Organic mushroom farming brand delivering fresh, pure, and quality produce across Telugu states.",
+    //   technologies: ["HTML/CSS", "JavaScript", "Bootstrap", "API Integration"],
+    //   results: [
+    //     'Expanded market reach',
+    //     'Consistent product quality',
+    //     'Faster delivery times',
+    //     'Increased customer trust',
+    //     'Higher yield per harvest'
+    //   ],
+    //   liveUrl: "https://jravahfoods.com/index.html",
+    //   featured: false,
+    // },
     {
       id: 12,
       title: "OneDay Co Working Labs",
@@ -255,15 +255,15 @@ const PortfolioPage = () => {
       client: "OneDay",
       image: "https://i.ibb.co/vWmSq6X/image.png",
       description: "Affordable coworking space with fast internet, conference room, and lounge at ONEDAY Co Working Labs.",
-      technologies: [
-            'High-Speed WiFi',
-            'Access Control Systems',
-            'Video Conferencing',
-            'Smart Lighting',
-            'Cloud Printing',
-            'Online Booking Platform',
-            'Security Cameras'
-      ],
+      // technologies: [
+      //       'High-Speed WiFi',
+      //       'Access Control Systems',
+      //       'Video Conferencing',
+      //       'Smart Lighting',
+      //       'Cloud Printing',
+      //       'Online Booking Platform',
+      //       'Security Cameras'
+      // ],
       results: [
           'Increased workspace productivity',
           'Seamless meeting experiences',
@@ -388,18 +388,18 @@ const PortfolioPage = () => {
                   </p>
 
                   <div className="mb-4">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                    {/* <h4 className="text-sm font-semibold text-gray-900 mb-2">
                       Technologies:
-                    </h4>
+                    </h4> */}
                     <div className="flex flex-wrap gap-2">
-                      {project.technologies.map((tech, idx) => (
+                      {/* {project.technologies.map((tech, idx) => (
                         <span
                           key={idx}
                           className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs"
                         >
                           {tech}
                         </span>
-                      ))}
+                      ))} */}
                     </div>
                   </div>
 
@@ -492,19 +492,19 @@ const PortfolioPage = () => {
 
                   <div className="mb-4">
                     <div className="flex flex-wrap gap-2">
-                      {project.technologies.slice(0, 3).map((tech, idx) => (
+                      {/* {project.technologies.slice(0, 3).map((tech, idx) => (
                         <span
                           key={idx}
                           className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs"
                         >
                           {tech}
-                        </span>
-                      ))}
+                        </span> */}
+                      {/* ))}
                       {project.technologies.length > 3 && (
                         <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
                           +{project.technologies.length - 3} more
                         </span>
-                      )}
+                      )} */}
                     </div>
                   </div>
 

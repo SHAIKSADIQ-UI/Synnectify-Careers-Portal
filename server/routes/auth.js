@@ -53,6 +53,9 @@ router.post('/google', async (req, res) => {
 // Admin login step 1: Verify credentials and send OTP
 router.post('/admin-login', async (req, res) => {
   try {
+    console.log('Admin login request received');
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+    
     const { email, password } = req.body;
     
     if (!email || !password) {
@@ -86,16 +89,22 @@ router.post('/admin-login', async (req, res) => {
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes expiration
     // OTP IMPLEMENTATION END
 
+    console.log('Generated OTP:', otpCode);
+    console.log('Expires at:', expiresAt);
+
     // Save OTP to database
-    await OTP.create({
+    const otpRecord = await OTP.create({
       email,
       code: hashPassword(otpCode), // Hash OTP before storing
       expiresAt
     });
+    
+    console.log('OTP saved to database with ID:', otpRecord._id);
 
     // Send OTP via email
     try {
-      await sendEmail(
+      console.log('Attempting to send OTP email to:', email);
+      const emailResult = await sendEmail(
         email,
         'Admin Panel Login - OTP Verification',
         `
@@ -114,9 +123,23 @@ router.post('/admin-login', async (req, res) => {
         </div>
         `
       );
-      console.log(`OTP sent to ${email}`);
+      console.log('OTP email sent successfully to:', email);
+      console.log('Email result:', JSON.stringify(emailResult, null, 2));
     } catch (emailError) {
       console.error('Failed to send OTP email:', emailError);
+      console.error('Email error details:');
+      console.error('Message:', emailError.message);
+      console.error('Code:', emailError.code);
+      console.error('Stack:', emailError.stack);
+      
+      // Delete the OTP record since we couldn't send the email
+      try {
+        await OTP.findByIdAndDelete(otpRecord._id);
+        console.log('Cleaned up OTP record due to email failure');
+      } catch (cleanupError) {
+        console.error('Failed to cleanup OTP record:', cleanupError);
+      }
+      
       return res.status(500).json({ error: 'Failed to send OTP. Please try again.' });
     }
 
@@ -128,6 +151,9 @@ router.post('/admin-login', async (req, res) => {
     });
   } catch (err) {
     console.error('Admin login error:', err);
+    console.error('Error details:');
+    console.error('Message:', err.message);
+    console.error('Stack:', err.stack);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -206,6 +232,9 @@ router.post('/admin-verify-otp', async (req, res) => {
     });
   } catch (err) {
     console.error('OTP verification error:', err);
+    console.error('Error details:');
+    console.error('Message:', err.message);
+    console.error('Stack:', err.stack);
     res.status(500).json({ error: 'Server error' });
   }
 });

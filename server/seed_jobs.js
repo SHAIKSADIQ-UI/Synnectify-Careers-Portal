@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const Job = require('./models/Job');
 
+// Load environment variables
+require('dotenv').config();
+
 const sampleJobs = [
   {
     title: 'Full Stack Developer',
@@ -121,6 +124,7 @@ const sampleJobs = [
 
 // Use the same MongoDB URI as the main application
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/it_website_db';
+console.log('Using MONGO_URI:', MONGO_URI);
 
 mongoose.connect(MONGO_URI)
   .then(async () => {

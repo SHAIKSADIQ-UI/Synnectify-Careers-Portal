@@ -672,22 +672,22 @@
 //     {
 //       id: 'photography',
 //       icon: Camera,
-//       title: 'Photography',
-//       subtitle: 'Photography Services',
+//       title: 'Product Photography',
+//       subtitle: 'Professional Product Photography Services',
 //       description:
-//         'Professional photography services with pre-shoot planning, high-res shoots, creative lighting, retouching, and event coverage.',
+//         'High-quality product photography that showcases your products in the best light. Our professional photographers create stunning visuals that drive sales and enhance your brand identity.',
 //       image: 'https://imgs.search.brave.com/jZEntI8sAG-l5nP5vM_xXyjVtRJnhZe61-Xg6xoWehU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzAzLzAyLzMwLzIw/LzM2MF9GXzMwMjMw/MjA5NF80ZUM0ajhv/SFhGU0VBRFdHSkUz/NmNIWlc2Vmt1b0Zq/ai5qcGc',
 //       features: [
-//         'Pre-shoot Planning & Consultation',
-//         'High-Resolution Photo Shoots',
+//         'Professional Product Photography',
+//         'Studio & On-location Shoots',
 //         'Creative Lighting Setup',
-//         'Flyers, Posters, & Brochures',
-//         'Web & App Graphics',
-//         'Packaging Design',
-//         'Adobe Photoshop',
-//         'Brand Discovery & Research'
+//         'High-resolution Images',
+//         'Image Retouching & Enhancement',
+//         '360-Degree Product Views',
+//         'E-commerce Product Images',
+//         'Brand Consistent Visuals'
 //       ],
-//       technologies: ['DJI Mavic', 'Phantom', 'SmugMug', 'Pixieset', 'Godox', 'Reflectors']
+//       technologies: ['Canon EOS R5', 'Sony A7R IV', 'Profoto Lighting', 'Adobe Photoshop', 'Lightroom']
 //     }
 //   ];
 
@@ -986,8 +986,8 @@
 
 
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Palette,
@@ -1006,6 +1006,7 @@ import {
 } from 'lucide-react';
 
 const ServicesPage = () => {
+  const location = useLocation();
   const [activeService, setActiveService] = useState('ui-ux');
 
   const services = [
@@ -1112,22 +1113,22 @@ const ServicesPage = () => {
     {
       id: 'photography',
       icon: Camera,
-      title: 'Photography',
-      subtitle: 'Photography Services',
+      title: 'Product Photography',
+      subtitle: 'Professional Product Photography Services',
       description:
-        'Professional photography services with pre-shoot planning, high-res shoots, creative lighting, retouching, and event coverage.',
+        'High-quality product photography that showcases your products in the best light. Our professional photographers create stunning visuals that drive sales and enhance your brand identity.',
       image: 'https://imgs.search.brave.com/jZEntI8sAG-l5nP5vM_xXyjVtRJnhZe61-Xg6xoWehU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzAzLzAyLzMwLzIw/LzM2MF9GXzMwMjMw/MjA5NF80ZUM0ajhv/SFhGU0VBRFdHSkUz/NmNIWlc2Vmt1b0Zq/ai5qcGc',
       features: [
-        'Pre-shoot Planning & Consultation',
-        'High-Resolution Photo Shoots',
+        'Professional Product Photography',
+        'Studio & On-location Shoots',
         'Creative Lighting Setup',
-        'Flyers, Posters, & Brochures',
-        'Web & App Graphics',
-        'Packaging Design',
-        'Adobe Photoshop',
-        'Brand Discovery & Research'
+        'High-resolution Images',
+        'Image Retouching & Enhancement',
+        '360-Degree Product Views',
+        'E-commerce Product Images',
+        'Brand Consistent Visuals'
       ],
-      technologies: ['DJI Mavic', 'Phantom', 'SmugMug', 'Pixieset', 'Godox', 'Reflectors']
+      technologies: ['Canon EOS R5', 'Sony A7R IV', 'Profoto Lighting', 'Adobe Photoshop', 'Lightroom']
     }
   ];
 
@@ -1186,6 +1187,29 @@ const ServicesPage = () => {
   ];
 
   const currentService = services.find((service) => service.id === activeService);
+
+  // Scroll to section when hash changes
+  useEffect(() => {
+    const scrollToSection = () => {
+      const hash = location.hash.replace('#', '');
+      if (hash) {
+        // Find the service that matches the hash
+        const service = services.find(s => s.id === hash);
+        if (service) {
+          setActiveService(service.id);
+          // Scroll to the service detail section
+          setTimeout(() => {
+            const element = document.getElementById('service-detail');
+            if (element) {
+              element.scrollIntoView({ behavior: 'smooth' });
+            }
+          }, 100);
+        }
+      }
+    };
+
+    scrollToSection();
+  }, [location.hash]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -1246,7 +1270,7 @@ const ServicesPage = () => {
 
       {/* Service Detail --------------------------------------------- */}
       {currentService && (
-        <section className="py-20">
+        <section id="service-detail" className="py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
               <div>

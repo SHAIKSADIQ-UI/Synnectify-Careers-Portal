@@ -48,22 +48,23 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Services</h3>
             <ul className="space-y-2 text-sm sm:text-base">
               {[
-  ['UI/UX Design', 'ui-ux'],
-  ['Web Development', 'web-development'],
-  ['Mobile Applications', 'mobile-apps'],
-  ['Digital Marketing', 'digital-marketing'],
-  ['Branding', 'branding'],
-  ['Cloud & DevOps', 'cloud-devops'],
-].map(([label, anchor]) => (
-  <li key={anchor}>
-    <Link
-      to={`/services#${anchor}`}
-      className="text-gray-400 hover:text-white transition-colors block"
-    >
-      {label}
-    </Link>
-  </li>
-))}            </ul>
+                ['UI/UX Design', 'ui-ux'],
+                ['Web Development', 'web-development'],
+                ['Mobile Applications', 'mobile-apps'],
+                ['Digital Marketing', 'digital-marketing'],
+                ['Branding', 'branding'],
+                ['Product Photography', 'photography'],
+              ].map(([label, anchor]) => (
+                <li key={anchor}>
+                  <Link
+                    to={`/services#${anchor}`}
+                    className="text-gray-400 hover:text-white transition-colors block"
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
           {/* Company */}
@@ -75,8 +76,8 @@ const Footer = () => {
                 ['Portfolio', '/portfolio'],
                 ['Contact', '/contact'],
                 ['Careers', '/careers'],
-                ['Blog', '/blog'],
-                ['Case Studies', '/case-studies'],
+                // ['Blog', '/blog'],
+                // ['Case Studies', '/case-studies'],
               ].map(([label, href]) => (
                 <li key={href}>
                   <Link
