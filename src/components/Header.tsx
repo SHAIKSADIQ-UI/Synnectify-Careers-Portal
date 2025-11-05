@@ -104,6 +104,12 @@ const Header = () => {
                       path.slice(2)}
                 </Link>
               ))}
+              {/* User Profile (only show when logged in) */}
+              {user && (
+                <div className="flex justify-center">
+                  <UserProfile />
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -83,6 +83,54 @@ app.get('/api/ping', (req, res) => {
   });
 });
 
+// Email test endpoint
+app.get('/api/test-email', async (req, res) => {
+  try {
+    const { sendEmail } = require('./utils/mailer');
+    
+    console.log('Email test requested');
+    console.log('Email configuration:', {
+      EMAIL_USER: process.env.EMAIL_USER,
+      EMAIL_PASS: process.env.EMAIL_PASS ? 'SET' : 'MISSING',
+      SMTP_HOST: process.env.SMTP_HOST,
+      SMTP_PORT: process.env.SMTP_PORT
+    });
+    
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      return res.status(400).json({ 
+        error: 'Email configuration incomplete',
+        details: 'EMAIL_USER and EMAIL_PASS must be set in environment variables'
+      });
+    }
+    
+    const result = await sendEmail(
+      process.env.EMAIL_USER, // Send to admin email
+      'Test Email from SYNNECTIFY',
+      `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #333;">SYNNECTIFY Email Test</h2>
+        <p>This is a test email to verify that the email configuration is working correctly.</p>
+        <p>If you received this email, the email system is functioning properly.</p>
+        <br>
+        <p>Best regards,<br>SYNNECTIFY Team</p>
+      </div>
+      `
+    );
+    
+    console.log('Email sent successfully:', result.messageId);
+    res.json({ 
+      message: 'Email sent successfully!',
+      messageId: result.messageId 
+    });
+  } catch (error) {
+    console.error('Email test failed:', error);
+    res.status(500).json({ 
+      error: 'Email test failed',
+      details: error.message 
+    });
+  }
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
