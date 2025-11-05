@@ -28,18 +28,16 @@ function requireAdmin(req, res, next) {
 // GET all jobs
 router.get('/', async (_req, res) => {
   try {
-    // Use native MongoDB driver to bypass Mongoose issues
-    const db = mongoose.connection.db;
-    const jobsCollection = db.collection('jobs');
-    const jobsData = await jobsCollection.find({}).sort({ createdAt: -1 }).toArray();
+    // Use Mongoose model to fetch jobs
+    const jobs = await Job.find({}).sort({ createdAt: -1 });
     
-    console.log(`📊 Fetched ${jobsData.length} jobs via native driver`);
-    if (jobsData.length > 0) {
-      console.log(`First job requirements:`, jobsData[0].requirements ? jobsData[0].requirements.length : 0);
-      console.log(`First job responsibilities:`, jobsData[0].responsibilities ? jobsData[0].responsibilities.length : 0);
+    console.log(`📊 Fetched ${jobs.length} jobs via Mongoose`);
+    if (jobs.length > 0) {
+      console.log(`First job requirements:`, jobs[0].requirements ? jobs[0].requirements.length : 0);
+      console.log(`First job responsibilities:`, jobs[0].responsibilities ? jobs[0].responsibilities.length : 0);
     }
     
-    res.json(jobsData);
+    res.json(jobs);
   } catch (err) {
     console.error('Error fetching jobs:', err);
     res.status(500).json({ error: 'Server error' });
