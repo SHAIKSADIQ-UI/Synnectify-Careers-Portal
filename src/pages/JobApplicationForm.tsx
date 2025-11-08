@@ -296,70 +296,82 @@ const JobApplicationForm = () => {
       const response = await fetch(`${API_URL}/applications/apply`, {
         method: "POST",
         body: formDataToSend,
-        
       });
 
       console.log("Response status:", response.status);
+      console.log("Response headers:", response.headers);
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Application submitted successfully:", result);
-        
-        // Save application to localStorage for immediate display in dashboard
-        const userEmail = formData.email; // Use the email from the form
-        if (userEmail) {
-          const existingApps = JSON.parse(localStorage.getItem(`apps_${userEmail}`) || "[]");
-          const newApp = {
-            _id: result.application._id,
-            position: position,
-            appliedAt: new Date().toISOString(),
-            status: "Pending"
-          };
-          localStorage.setItem(`apps_${userEmail}`, JSON.stringify([newApp, ...existingApps]));
-        }
-        
-        // Show success modal instead of redirecting
-        setShowSuccessModal(true);
-        // Reset form data after showing the modal
-        setFormData({
-          firstName: "",
-          lastName: "",
-          email: "",
-          phone: "",
-          dob: "",
-          gender: "",
-          address: "",
-          country: "",
-          state: "",
-          city: "",
-          zipCode: "",
-          currentPosition: "",
-          currentCompany: "",
-          totalExperience: "",
-          skills: "",
-          expertise: "",
-          education: "",
-          experience: "",
-          portfolio: "",
-          github: "",
-          linkedin: "",
-          coverLetter: "",
-          declaration: false,
-          resume: null,
-        });
-      } else {
-        // Try to get error message from response
-        let errorMessage = "Failed to submit application.";
+      // Check if response is actually ok and has valid content
+      if (!response.ok) {
+        let errorMessage = `Server error: ${response.status} ${response.statusText}`;
         try {
           const errorData = await response.json();
           errorMessage = errorData.error || errorData.message || errorMessage;
           console.error("Server error response:", errorData);
         } catch (e) {
-          // If we can't parse JSON, use status text
-          errorMessage = response.statusText || errorMessage;
+          console.error("Could not parse error response:", e);
         }
-        setSubmitError(errorMessage);
+        throw new Error(errorMessage);
       }
+
+      // Parse successful response
+      let result;
+      try {
+        result = await response.json();
+        console.log("Application submitted successfully:", result);
+      } catch (e) {
+        console.error("Could not parse success response:", e);
+        throw new Error("Invalid server response format");
+      }
+
+      // Validate response contains required data
+      if (!result || !result.application) {
+        throw new Error("Invalid server response: missing application data");
+      }
+
+      // Save application to localStorage for immediate display in dashboard
+      const userEmail = formData.email; // Use the email from the form
+      if (userEmail) {
+        const existingApps = JSON.parse(localStorage.getItem(`apps_${userEmail}`) || "[]");
+        const newApp = {
+          _id: result.application._id,
+          position: position,
+          appliedAt: new Date().toISOString(),
+          status: "Pending"
+        };
+        localStorage.setItem(`apps_${userEmail}`, JSON.stringify([newApp, ...existingApps]));
+      }
+
+      // Show success modal - redirect will be handled by useEffect
+      setShowSuccessModal(true);
+
+      // Reset form data after showing the modal
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        dob: "",
+        gender: "",
+        address: "",
+        country: "",
+        state: "",
+        city: "",
+        zipCode: "",
+        currentPosition: "",
+        currentCompany: "",
+        totalExperience: "",
+        skills: "",
+        expertise: "",
+        education: "",
+        experience: "",
+        portfolio: "",
+        github: "",
+        linkedin: "",
+        coverLetter: "",
+        declaration: false,
+        resume: null,
+      });
     } catch (error) {
       // More detailed error handling
       console.error("Submission error:", error);
