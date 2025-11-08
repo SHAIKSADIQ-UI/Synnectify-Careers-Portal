@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const { connectDB } = require('./config/db');
+const { checkEmailServiceHealth } = require('./utils/mailer');
 
 const authRoutes = require('./routes/auth');
 const jobRoutes = require('./routes/jobs');
