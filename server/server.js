@@ -75,12 +75,47 @@ app.get('/', (req, res) => {
 });
 
 // Health check
-app.get('/api/ping', (req, res) => {
-  res.status(200).json({ 
-    status: 'active',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
+app.get('/api/ping', async (req, res) => {
+  try {
+    const { checkEmailServiceHealth } = require('./utils/mailer');
+
+    // Basic health info
+    const healthInfo = {
+      status: 'active',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      services: {
+        database: 'connected',
+        email: 'checking...'
+      }
+    };
+
+    // Check email service health
+    try {
+      const emailHealth = await checkEmailServiceHealth();
+      healthInfo.services.email = emailHealth.authenticated ? 'healthy' : 'unhealthy';
+      healthInfo.emailDetails = {
+        configured: emailHealth.configured,
+        authenticated: emailHealth.authenticated,
+        reachable: emailHealth.reachable,
+        error: emailHealth.error || null
+      };
+    } catch (emailError) {
+      healthInfo.services.email = 'error';
+      healthInfo.emailDetails = {
+        error: emailError.message
+      };
+    }
+
+    res.status(200).json(healthInfo);
+  } catch (error) {
+    console.error('Health check failed:', error);
+    res.status(500).json({
+      status: 'error',
+      timestamp: new Date().toISOString(),
+      error: error.message
+    });
+  }
 });
 
 // Email test endpoint
