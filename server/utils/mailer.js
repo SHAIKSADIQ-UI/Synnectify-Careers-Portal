@@ -98,4 +98,62 @@ async function sendEmail(to, subject, html, replyTo = null) {
   }
 }
 
-module.exports = { sendEmail };
+/**
+ * Check email service health and configuration
+ * @returns {Promise<Object>} - Health check result
+ */
+async function checkEmailServiceHealth() {
+  console.log('=== EMAIL SERVICE HEALTH CHECK ===');
+
+  const healthStatus = {
+    configured: false,
+    authenticated: false,
+    reachable: false,
+    details: {}
+  };
+
+  // Check environment variables
+  const envChecks = {
+    EMAIL_USER: !!process.env.EMAIL_USER,
+    EMAIL_PASS: !!process.env.EMAIL_PASS,
+    EMAIL_FROM: !!process.env.EMAIL_FROM,
+    EMAIL_REPLY_TO: !!process.env.EMAIL_REPLY_TO,
+    SMTP_HOST: !!process.env.SMTP_HOST,
+    SMTP_PORT: !!process.env.SMTP_PORT
+  };
+
+  healthStatus.details.environment = envChecks;
+  healthStatus.configured = Object.values(envChecks).every(check => check);
+
+  if (!healthStatus.configured) {
+    healthStatus.error = 'Missing required environment variables';
+    return healthStatus;
+  }
+
+  try {
+    // Test transporter connection
+    await transporter.verify();
+    healthStatus.authenticated = true;
+    healthStatus.reachable = true;
+    console.log('✅ Email service is healthy and ready');
+  } catch (error) {
+    console.error('❌ Email service health check failed:', error.message);
+    healthStatus.error = error.message;
+
+    // Provide specific error guidance
+    if (error.code === 'EAUTH') {
+      healthStatus.error = 'Authentication failed - check EMAIL_USER and EMAIL_PASS';
+      console.error('💡 Fix: Verify Gmail App Password is correct');
+    } else if (error.code === 'ECONNECTION') {
+      healthStatus.error = 'Connection failed - check SMTP_HOST and SMTP_PORT';
+      console.error('💡 Fix: Verify Gmail SMTP settings and network connection');
+    } else if (error.code === 'ESOCKET') {
+      healthStatus.error = 'Socket error - check firewall and network';
+      console.error('💡 Fix: Check network connectivity to Gmail SMTP');
+    }
+  }
+
+  return healthStatus;
+}
+
+module.exports = { sendEmail, checkEmailServiceHealth };
