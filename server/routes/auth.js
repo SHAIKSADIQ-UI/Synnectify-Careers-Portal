@@ -7,6 +7,48 @@ const { sendEmail } = require('../utils/mailer');
 
 const router = express.Router();
 
+// Simple in-memory rate limiter for OTP requests
+const otpRateLimit = new Map(); // email -> { count, lastRequest }
+
+// Rate limiting function (5 OTP requests per 15 minutes per email)
+function checkRateLimit(email, limit = 5, windowMs = 15 * 60 * 1000) {
+  const now = Date.now();
+  const record = otpRateLimit.get(email);
+
+  if (!record) {
+    otpRateLimit.set(email, { count: 1, lastRequest: now });
+    return true;
+  }
+
+  // Reset if window has passed
+  if (now - record.lastRequest > windowMs) {
+    otpRateLimit.set(email, { count: 1, lastRequest: now });
+    return true;
+  }
+
+  // Check limit
+  if (record.count >= limit) {
+    return false;
+  }
+
+  // Increment count
+  record.count++;
+  record.lastRequest = now;
+  return true;
+}
+
+// Clean up old rate limit records periodically
+setInterval(() => {
+  const now = Date.now();
+  const cutoff = now - 15 * 60 * 1000; // 15 minutes ago
+
+  for (const [email, record] of otpRateLimit.entries()) {
+    if (record.lastRequest < cutoff) {
+      otpRateLimit.delete(email);
+    }
+  }
+}, 5 * 60 * 1000); // Clean every 5 minutes
+
 // Helper function to hash password
 function hashPassword(password) {
   return crypto.createHash('sha256').update(password).digest('hex');
