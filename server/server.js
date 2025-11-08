@@ -219,7 +219,23 @@ const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 connectDB()
-  .then(() => {
+  .then(async () => {
+    // Verify email service health at startup
+    console.log('🔍 Checking email service health...');
+    try {
+      const emailHealth = await checkEmailServiceHealth();
+      if (emailHealth.authenticated) {
+        console.log('✅ Email service: Healthy and authenticated');
+      } else {
+        console.log('⚠️  Email service: Configuration issue detected');
+        console.log(`   Error: ${emailHealth.error || 'Unknown error'}`);
+        console.log('   Emails will be skipped until configuration is fixed');
+      }
+    } catch (error) {
+      console.log('❌ Email service: Failed to initialize');
+      console.log(`   Error: ${error.message}`);
+    }
+
     app.listen(PORT, () => {
       console.log('='.repeat(50));
       console.log(`🚀 Server running on http://localhost:${PORT}`);
