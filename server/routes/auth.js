@@ -96,57 +96,50 @@ router.post('/google', async (req, res) => {
 router.post('/admin-login', async (req, res) => {
   try {
     console.log('=== ADMIN LOGIN ATTEMPT ===');
-    console.log('Request headers:', req.headers);
-    console.log('Request body:', JSON.stringify(req.body, null, 2));
-    console.log('Content type:', req.headers['content-type']);
-    
-    // Check if body exists and is parsed correctly
-    if (!req.body) {
-      console.log('❌ No request body received');
-      return res.status(400).json({ error: 'No request body received' });
-    }
-    
     const { email, password } = req.body;
-    
-    console.log('Extracted email:', email);
-    console.log('Extracted password:', password ? 'PROVIDED' : 'MISSING');
-    
+
+    console.log('Email:', email);
+    console.log('Password provided:', !!password);
+
     if (!email || !password) {
       console.log('❌ Email or password missing');
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
+    // Check rate limiting
+    if (!checkRateLimit(email)) {
+      console.log('❌ Rate limit exceeded for email:', email);
+      return res.status(429).json({
+        error: 'Too many OTP requests. Please wait 15 minutes before trying again.'
+      });
+    }
+
     // Check if email is the allowed admin email
-    // OTP IMPLEMENTATION START
     if (email !== 'careers.synnectify@gmail.com') {
       console.log('❌ Unauthorized email:', email);
-      return res.status(403).json({ error: 'Access denied. Only careers.synnectify@gmail.com can access admin panel.' });
+      return res.status(403).json({
+        error: 'Access denied. Only careers.synnectify@gmail.com can access admin panel.'
+      });
     }
 
     // Check if password matches the fixed admin password
     if (password !== 'Synnectify-Careers_2906') {
-      console.log('❌ Invalid password');
+      console.log('❌ Invalid password for email:', email);
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    // Since we're not checking against database for this specific case,
-    // we'll create a temporary user object
-    const user = {
-      _id: 'admin-user-id',
-      name: 'Admin User',
-      email: 'careers.synnectify@gmail.com',
-      role: 'admin'
-    };
-    // OTP IMPLEMENTATION END
+    // Clean up any existing unused OTPs for this email
+    await OTP.deleteMany({
+      email,
+      used: false,
+      expiresAt: { $lt: new Date() }
+    });
 
     // Generate and send OTP
     const otpCode = generateOTP();
-    // OTP IMPLEMENTATION START - Set expiration to 5 minutes
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes expiration
-    // OTP IMPLEMENTATION END
 
-    console.log('Generated OTP:', otpCode);
-    console.log('Expires at:', expiresAt);
+    console.log('Generated OTP for', email, '- expires at:', expiresAt);
 
     // Save OTP to database
     const otpRecord = await OTP.create({
@@ -154,8 +147,8 @@ router.post('/admin-login', async (req, res) => {
       code: hashPassword(otpCode), // Hash OTP before storing
       expiresAt
     });
-    
-    console.log('OTP saved to database with ID:', otpRecord._id);
+
+    console.log('✅ OTP saved to database with ID:', otpRecord._id);
 
     // Send OTP via email
     try {
