@@ -857,9 +857,15 @@ const JobApplicationForm = () => {
               <p className="text-gray-600 mb-6">
                 Thank you for applying! We'll review your application and get back to you soon.
               </p>
-              <p className="text-gray-500 text-sm">
+              <p className="text-gray-500 text-sm mb-4">
                 Redirecting to your dashboard...
               </p>
+              <button
+                onClick={goToDashboard}
+                className="bg-gradient-to-r from-orange-500 to-blue-500 text-white px-6 py-2 rounded-lg font-medium hover:from-orange-600 hover:to-blue-600 transition-all duration-300"
+              >
+                Go to Dashboard Now
+              </button>
             </div>
           </div>
         </div>
