@@ -392,6 +392,7 @@ const JobApplicationForm = () => {
 
   // Function to handle dashboard navigation
   const goToDashboard = () => {
+    console.log("🚀 Manual redirect to dashboard...");
     setShowSuccessModal(false);
     navigate("/dashboard");
   };
