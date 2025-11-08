@@ -48,10 +48,11 @@ async function testEmail() {
     if (error.code === 'EAUTH') {
       console.error('\n🔐 AUTHENTICATION ERROR:');
       console.error('Please verify:');
-      console.error('1. EMAIL_USER is set to careers.synnectify@gmail.com');
-      console.error('2. EMAIL_PASS is set to your Google App Password: sodk lmmq yivk lftv');
+      console.error('1. EMAIL_USER is set correctly in .env file');
+      console.error('2. EMAIL_PASS contains your valid Google App Password');
       console.error('3. Gmail App Password is correctly generated with 2FA enabled');
-      console.error('4. Visit: https://myaccount.google.com/apppasswords to verify');
+      console.error('4. Visit: https://myaccount.google.com/apppasswords to generate/recreate app password');
+      console.error('5. Ensure .env file exists with proper credentials');
     }
   }
 }
