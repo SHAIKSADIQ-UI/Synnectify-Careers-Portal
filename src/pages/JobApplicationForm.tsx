@@ -182,12 +182,17 @@ const JobApplicationForm = () => {
   // Effect for automatic redirect after 2 seconds
   useEffect(() => {
     if (showSuccessModal) {
+      console.log("🎯 Setting up redirect timer...");
       const timer = setTimeout(() => {
+        console.log("🔄 Redirecting to dashboard...");
         setShowSuccessModal(false);
         navigate("/dashboard");
       }, 2000);
-      
-      return () => clearTimeout(timer);
+
+      return () => {
+        console.log("🧹 Cleaning up redirect timer");
+        clearTimeout(timer);
+      };
     }
   }, [showSuccessModal, navigate]);
 
