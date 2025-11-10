@@ -27,7 +27,7 @@ const transporter = nodemailer.createTransport({
 async function sendEmail(to, subject, html, replyTo = null) {
   console.log('=== EMAIL CONFIGURATION CHECK ===');
   console.log('EMAIL_USER:', process.env.EMAIL_USER ? 'SET' : 'MISSING');
-  console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? 'SET' : 'MISSING');
+  console.log('EMAIL_PASSWORD:', process.env.EMAIL_PASSWORD ? 'SET' : 'MISSING');
   console.log('EMAIL_FROM:', process.env.EMAIL_FROM || 'NOT SET');
   console.log('EMAIL_REPLY_TO:', process.env.EMAIL_REPLY_TO || 'NOT SET');
   console.log('SMTP_HOST:', process.env.SMTP_HOST || 'DEFAULT');
@@ -45,7 +45,7 @@ async function sendEmail(to, subject, html, replyTo = null) {
   }
   
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
-    console.warn('⚠️ EMAIL_USER or EMAIL_PASS not configured. Skipping email send.');
+    console.warn('⚠️ EMAIL_USER or EMAIL_PASSWORD not configured. Skipping email send.');
     console.warn('📧 Would have sent email to:', to);
     console.warn('📧 Subject:', subject);
     return { skipped: true };
@@ -100,7 +100,7 @@ async function sendEmail(to, subject, html, replyTo = null) {
     if (error.code === 'EAUTH') {
       console.error('\n⚠️ AUTHENTICATION ERROR:');
       console.error('Please check:');
-      console.error('1. EMAIL_USER and EMAIL_PASS are set correctly in .env');
+      console.error('1. EMAIL_USER and EMAIL_PASSWORD are set correctly in .env');
       console.error('2. If using Gmail, enable "App Passwords" with 2FA');
       console.error('3. Visit: https://myaccount.google.com/apppasswords\n');
     }

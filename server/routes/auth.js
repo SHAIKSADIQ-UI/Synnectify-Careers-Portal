@@ -120,7 +120,7 @@ router.post('/admin-login', async (req, res) => {
       console.log('Attempting to send OTP email to:', email);
       console.log('Email configuration check:', {
         EMAIL_USER: process.env.EMAIL_USER,
-        EMAIL_PASS: process.env.EMAIL_PASS ? 'SET' : 'MISSING',
+        EMAIL_PASSWORD: process.env.EMAIL_PASSWORD ? 'SET' : 'MISSING',
         SMTP_HOST: process.env.SMTP_HOST,
         SMTP_PORT: process.env.SMTP_PORT
       });

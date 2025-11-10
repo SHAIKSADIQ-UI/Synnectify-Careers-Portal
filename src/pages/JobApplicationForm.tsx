@@ -179,13 +179,13 @@ const JobApplicationForm = () => {
   const [fileError, setFileError] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // Effect for automatic redirect after 2 seconds
+  // Effect for automatic redirect after 1 second
   useEffect(() => {
     if (showSuccessModal) {
       const timer = setTimeout(() => {
         setShowSuccessModal(false);
         navigate("/dashboard");
-      }, 2000);
+      }, 1000);
       
       return () => clearTimeout(timer);
     }
@@ -231,6 +231,10 @@ const JobApplicationForm = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    // Prevent double submission
+    if (isSubmitting) return;
+    
     setIsSubmitting(true);
     setSubmitError("");
 
@@ -289,14 +293,14 @@ const JobApplicationForm = () => {
         jobId: jobId
       });
 
-      // Use the API URL from environment variables
-      const API_URL = import.meta.env.VITE_API_URL || "https://synnectify-backend.onrender.com/api";
+      // Use the API URL from environment variables with fallback to relative path for Vercel
+      // This ensures it works both in local development and production deployments
+      const API_URL = import.meta.env.VITE_API_URL || "/api";
 
       // Try to submit to the correct API endpoint
       const response = await fetch(`${API_URL}/applications/apply`, {
         method: "POST",
         body: formDataToSend,
-        
       });
 
       console.log("Response status:", response.status);
@@ -318,8 +322,9 @@ const JobApplicationForm = () => {
           localStorage.setItem(`apps_${userEmail}`, JSON.stringify([newApp, ...existingApps]));
         }
         
-        // Show success modal instead of redirecting
+        // Show success modal - redirect will happen via useEffect
         setShowSuccessModal(true);
+        
         // Reset form data after showing the modal
         setFormData({
           firstName: "",
@@ -359,6 +364,8 @@ const JobApplicationForm = () => {
           errorMessage = response.statusText || errorMessage;
         }
         setSubmitError(errorMessage);
+        // Re-enable the submit button on error
+        setIsSubmitting(false);
       }
     } catch (error) {
       // More detailed error handling
@@ -368,7 +375,7 @@ const JobApplicationForm = () => {
       } else {
         setSubmitError("An unexpected error occurred while submitting the application. Please try again.");
       }
-    } finally {
+      // Re-enable the submit button on error
       setIsSubmitting(false);
     }
   };
