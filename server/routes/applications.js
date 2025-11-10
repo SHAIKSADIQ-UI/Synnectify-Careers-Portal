@@ -6,6 +6,14 @@ const jwt = require('jsonwebtoken');
 const Application = require('../models/Application');
 const Job = require('../models/Job');
 const { sendEmail } = require('../utils/mailer');
+const {
+  sendApplicationReceived,
+  sendShortlisted,
+  sendRejected,
+  sendInterviewScheduled,
+  sendCompleted,
+  notifyAdminOnNewApplication
+} = require('../utils/emailService');
 
 const router = express.Router();
 
@@ -156,151 +164,35 @@ router.post('/apply', upload.single('resume'), async (req, res) => {
     
     console.log(`✅ Application created successfully: ${appDoc._id} for ${jobTitle}`);
 
-    // === EMAIL 1: Send to careers.synnectify@gmail.com (Company Notification) ===
-    const companyEmail = 'careers.synnectify@gmail.com';
-    const companySubject = `New Job Application Received - ${jobTitle}`;
-    const companyHtml = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; border-radius: 10px;">
-        <div style="background: linear-gradient(135deg, #f97316 0%, #3b82f6 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 28px;">SYNNECTIFY</h1>
-          <p style="color: white; margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">New Application Alert</p>
-        </div>
-        
-        <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px;">
-          <h2 style="color: #1f2937; margin-top: 0;">📋 New Application Received</h2>
-          
-          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #1f2937; margin-top: 0; font-size: 16px;">Applicant Details:</h3>
-            <ul style="color: #4b5563; margin: 10px 0; padding-left: 20px; line-height: 1.8;">
-              <li><strong>Name:</strong> ${fullName}</li>
-              <li><strong>Email:</strong> ${applicantEmail}</li>
-              <li><strong>Phone:</strong> ${phone || 'N/A'}</li>
-              <li><strong>DOB:</strong> ${dob || 'N/A'}</li>
-              <li><strong>Gender:</strong> ${gender || 'N/A'}</li>
-              <li><strong>LinkedIn:</strong> ${linkedin || 'N/A'}</li>
-              <li><strong>Position:</strong> ${jobTitle}</li>
-              <li><strong>Application Date:</strong> ${new Date().toLocaleDateString()}</li>
-              ${message || coverLetter ? `<li><strong>Message:</strong> ${message || coverLetter}</li>` : ''}
-            </ul>
-          </div>
-          
-          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #1f2937; margin-top: 0; font-size: 16px;">Contact Details:</h3>
-            <ul style="color: #4b5563; margin: 10px 0; padding-left: 20px; line-height: 1.8;">
-              <li><strong>Address:</strong> ${address || 'N/A'}</li>
-              <li><strong>City:</strong> ${city || 'N/A'}</li>
-              <li><strong>State:</strong> ${state || 'N/A'}</li>
-              <li><strong>Country:</strong> ${country || 'N/A'}</li>
-              <li><strong>Zip Code:</strong> ${zipCode || 'N/A'}</li>
-            </ul>
-          </div>
-          
-          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #1f2937; margin-top: 0; font-size: 16px;">Professional Information:</h3>
-            <ul style="color: #4b5563; margin: 10px 0; padding-left: 20px; line-height: 1.8;">
-              <li><strong>Current Position:</strong> ${currentPosition || 'N/A'}</li>
-              <li><strong>Current Company:</strong> ${currentCompany || 'N/A'}</li>
-              <li><strong>Total Experience:</strong> ${totalExperience || 'N/A'}</li>
-            </ul>
-          </div>
-          
-          ${skills ? `<div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #1f2937; margin-top: 0; font-size: 16px;">Skills:</h3>
-            <p style="color: #4b5563; margin: 10px 0;">${skills}</p>
-          </div>` : ''}
-          
-          ${expertise ? `<div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #1f2937; margin-top: 0; font-size: 16px;">Expertise:</h3>
-            <p style="color: #4b5563; margin: 10px 0;">${expertise}</p>
-          </div>` : ''}
-          
-          ${education ? `<div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #1f2937; margin-top: 0; font-size: 16px;">Education:</h3>
-            <p style="color: #4b5563; margin: 10px 0;">${education}</p>
-          </div>` : ''}
-          
-          ${experience ? `<div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #1f2937; margin-top: 0; font-size: 16px;">Experience:</h3>
-            <p style="color: #4b5563; margin: 10px 0;">${experience}</p>
-          </div>` : ''}
-          
-          ${portfolio || github || linkedin ? `<div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #1f2937; margin-top: 0; font-size: 16px;">Additional Links:</h3>
-            <ul style="color: #4b5563; margin: 10px 0; padding-left: 20px; line-height: 1.8;">
-              ${portfolio ? `<li><strong>Portfolio:</strong> ${portfolio}</li>` : ''}
-              ${github ? `<li><strong>GitHub:</strong> ${github}</li>` : ''}
-              ${linkedin ? `<li><strong>LinkedIn:</strong> ${linkedin}</li>` : ''}
-            </ul>
-          </div>` : ''}
-          
-          ${resumePath ? `<p style="color: #4b5563;">📎 <strong>Resume attached:</strong> Check server uploads folder</p>` : ''}
-          
-          <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 20px;">
-            &copy; ${new Date().getFullYear()} SYNNECTIFY. All rights reserved.
-          </p>
-        </div>
-      </div>
-    `;
-    
     // Try to send emails, but don't fail the application if emails fail
     try {
-      console.log('Sending company notification email to:', companyEmail);
-      await sendEmail(companyEmail, companySubject, companyHtml);
+      console.log('Sending company notification email to: careers.synnectify@gmail.com');
+      await notifyAdminOnNewApplication({
+        toAdmin: 'careers.synnectify@gmail.com',
+        jobTitle: jobTitle,
+        applicantName: fullName,
+        applicationId: appDoc._id
+      });
       console.log('✅ Company notification email sent');
     } catch (emailError) {
       console.error('⚠️ Failed to send company email, but application saved:', emailError.message);
+      // Log additional error details for debugging
+      console.error('Email error stack:', emailError.stack);
     }
 
-    // === EMAIL 2: Send confirmation to applicant ===
-    const applicantSubject = `Application Received - ${jobTitle} at SYNNECTIFY`;
-    const applicantHtml = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; border-radius: 10px;">
-        <div style="background: linear-gradient(135deg, #f97316 0%, #3b82f6 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 28px;">SYNNECTIFY</h1>
-          <p style="color: white; margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Career Portal</p>
-        </div>
-        
-        <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px;">
-          <h2 style="color: #1f2937; margin-top: 0;">✅ Application Received!</h2>
-          
-          <p style="color: #4b5563; line-height: 1.6;">Dear <strong>${fullName}</strong>,</p>
-          
-          <p style="color: #4b5563; line-height: 1.6;">
-            Thank you for applying for the position of <strong>${jobTitle}</strong> at SYNNECTIFY. 
-            We have successfully received your application.
-          </p>
-          
-          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #1f2937; margin-top: 0; font-size: 16px;">Application Details:</h3>
-            <ul style="color: #4b5563; margin: 10px 0; padding-left: 20px;">
-              <li><strong>Position:</strong> ${jobTitle}</li>
-              <li><strong>Status:</strong> <span style="color: #f59e0b;">Pending Review</span></li>
-              <li><strong>Applied On:</strong> ${new Date().toLocaleDateString()}</li>
-            </ul>
-          </div>
-          
-          <p style="color: #4b5563; line-height: 1.6;">
-            Our recruitment team will review your application and get back to you within 5-7 business days.
-          </p>
-          
-          <p style="color: #6b7280; font-size: 13px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-            <strong>Note:</strong> This is an automated no-reply email. Please do not respond to this message.
-            If you have any questions, please contact us at <a href="mailto:careers.synnectify@gmail.com" style="color: #f97316;">careers.synnectify@gmail.com</a>
-          </p>
-          
-          <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 20px;">
-            &copy; ${new Date().getFullYear()} SYNNECTIFY. All rights reserved.
-          </p>
-        </div>
-      </div>
-    `;
-    
     try {
       console.log('Sending applicant confirmation email to:', applicantEmail);
-      await sendEmail(applicantEmail, applicantSubject, applicantHtml);
+      await sendApplicationReceived({
+        to: applicantEmail,
+        applicantName: fullName,
+        jobTitle: jobTitle,
+        applicationId: appDoc._id
+      });
       console.log('✅ Applicant confirmation email sent');
     } catch (emailError) {
       console.error('⚠️ Failed to send applicant email, but application saved:', emailError.message);
+      // Log additional error details for debugging
+      console.error('Email error stack:', emailError.stack);
     }
 
     console.log('=== APPLICATION SUBMISSION COMPLETE ===');
@@ -309,7 +201,26 @@ router.post('/apply', upload.single('resume'), async (req, res) => {
     console.error('❌ Application submission error:', err);
     console.error('Error details:', err.message);
     console.error('Stack trace:', err.stack);
-    res.status(500).json({ error: 'Server error. Please try again later.', details: err.message });
+    
+    // Provide more specific error messages
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({ 
+        error: 'Validation error', 
+        details: Object.values(err.errors).map(e => e.message) 
+      });
+    }
+    
+    if (err.name === 'MongoError' && err.code === 11000) {
+      return res.status(400).json({ 
+        error: 'Duplicate application', 
+        details: 'An application with this email already exists for this position' 
+      });
+    }
+    
+    res.status(500).json({ 
+      error: 'Server error. Please try again later.', 
+      details: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+    });
   }
 });
 
@@ -360,213 +271,74 @@ router.patch('/:id', verifyToken, requireAdmin, async (req, res) => {
     // Send status email ONLY if not ignored
     // When status is "Ignored", no email is sent (for spam/incomplete applications)
     if (status !== 'Ignored') {
-      const subject = `Application Status Update - ${application.jobId?.title || 'Position'} at SYNNECTIFY`;
-      let html;
-      
-      if (status === 'Shortlisted') {
-        html = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; border-radius: 10px;">
-            <div style="background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-              <h1 style="color: white; margin: 0; font-size: 28px;">SYNNECTIFY</h1>
-              <p style="color: white; margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Career Portal</p>
-            </div>
-            
-            <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px;">
-              <h2 style="color: #059669; margin-top: 0;">🎉 Congratulations!</h2>
-              
-              <p style="color: #4b5563; line-height: 1.6;">Dear <strong>${application.name}</strong>,</p>
-              
-              <p style="color: #4b5563; line-height: 1.6;">
-                We are pleased to inform you that you have been <strong style="color: #059669;">shortlisted</strong> for the position of <strong>${application.jobId?.title || 'the applied position'}</strong> at SYNNECTIFY.
-              </p>
-              
-              <div style="background: #d1fae5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
-                <p style="color: #065f46; margin: 0; line-height: 1.6;">
-                  <strong>✅ Next Steps:</strong><br/>
-                  Our HR team will contact you shortly via email or phone with details about the next round of the recruitment process.
-                </p>
-              </div>
-              
-              <p style="color: #4b5563; line-height: 1.6;">
-                Please keep an eye on your email and phone for further communication from us.
-              </p>
-              
-              <p style="color: #6b7280; font-size: 13px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                <strong>Note:</strong> This is an automated no-reply email. For inquiries, contact <a href="mailto:careers.synnectify@gmail.com" style="color: #f97316;">careers.synnectify@gmail.com</a>
-              </p>
-              
-              <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 20px;">
-                &copy; ${new Date().getFullYear()} SYNNECTIFY. All rights reserved.
-              </p>
-            </div>
-          </div>
-        `;
-      } else if (status === 'Rejected') {
-        html = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; border-radius: 10px;">
-            <div style="background: linear-gradient(135deg, #6b7280 0%, #374151 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-              <h1 style="color: white; margin: 0; font-size: 28px;">SYNNECTIFY</h1>
-              <p style="color: white; margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Career Portal</p>
-            </div>
-            
-            <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px;">
-              <h2 style="color: #1f2937; margin-top: 0;">Application Update</h2>
-              
-              <p style="color: #4b5563; line-height: 1.6;">Dear <strong>${application.name}</strong>,</p>
-              
-              <p style="color: #4b5563; line-height: 1.6;">
-                Thank you for your interest in the <strong>${application.jobId?.title || 'position'}</strong> at SYNNECTIFY and for taking the time to apply.
-              </p>
-              
-              <p style="color: #4b5563; line-height: 1.6;">
-                After careful consideration, we regret to inform you that we will not be moving forward with your application at this time. 
-                We received many qualified candidates and the selection was highly competitive.
-              </p>
-              
-              <p style="color: #4b5563; line-height: 1.6;">
-                We encourage you to apply for future openings that match your skills and experience. We wish you the best in your job search and future endeavors.
-              </p>
-              
-              <p style="color: #6b7280; font-size: 13px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                <strong>Note:</strong> This is an automated no-reply email. For inquiries, contact <a href="mailto:careers.synnectify@gmail.com" style="color: #f97316;">careers.synnectify@gmail.com</a>
-              </p>
-              
-              <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 20px;">
-                &copy; ${new Date().getFullYear()} SYNNECTIFY. All rights reserved.
-              </p>
-            </div>
-          </div>
-        `;
-      } else if (status === 'Interview') {
-        html = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; border-radius: 10px;">
-            <div style="background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-              <h1 style="color: white; margin: 0; font-size: 28px;">SYNNECTIFY</h1>
-              <p style="color: white; margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Career Portal</p>
-            </div>
-            
-            <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px;">
-              <h2 style="color: #7e22ce; margin-top: 0;">📅 Interview Scheduled!</h2>
-              
-              <p style="color: #4b5563; line-height: 1.6;">Dear <strong>${application.name}</strong>,</p>
-              
-              <p style="color: #4b5563; line-height: 1.6;">
-                Great news! You have been selected for the next round of interviews for the position of <strong>${application.jobId?.title || 'the applied position'}</strong> at SYNNECTIFY.
-              </p>
-              
-              <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                <h3 style="color: #1f2937; margin-top: 0; font-size: 16px;">Interview Details:</h3>
-                <ul style="color: #4b5563; margin: 10px 0; padding-left: 20px;">
-                  <li><strong>Date:</strong> ${application.interviewDetails?.date || 'To be confirmed'}</li>
-                  <li><strong>Time:</strong> ${application.interviewDetails?.time || 'To be confirmed'}</li>
-                  <li><strong>Location/Link:</strong> ${application.interviewDetails?.meetingLink || 'To be confirmed'}</li>
-                </ul>
-              </div>
-              
-              <p style="color: #4b5563; line-height: 1.6;">
-                Please confirm your availability for the scheduled interview. If you need to reschedule, please contact us at least 24 hours in advance.
-              </p>
-              
-              <p style="color: #6b7280; font-size: 13px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                <strong>Note:</strong> This is an automated no-reply email. For inquiries, contact <a href="mailto:careers.synnectify@gmail.com" style="color: #f97316;">careers.synnectify@gmail.com</a>
-              </p>
-              
-              <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 20px;">
-                &copy; ${new Date().getFullYear()} SYNNECTIFY. All rights reserved.
-              </p>
-            </div>
-          </div>
-        `;
-      } else if (status === 'Completed') {
-        // Extract first name from full name
-        const firstName = application.name.split(' ')[0] || application.name;
-        const positionTitle = application.jobId?.title || 'the applied position';
-        
-        html = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; border-radius: 10px;">
-            <div style="background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-              <h1 style="color: white; margin: 0; font-size: 28px;">SYNNECTIFY</h1>
-              <p style="color: white; margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Career Portal</p>
-            </div>
-            
-            <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px;">
-              <h2 style="color: #059669; margin-top: 0;">🎉 Congratulations!</h2>
-              
-              <p style="color: #4b5563; line-height: 1.6;">Hi <strong>${firstName}</strong>,</p>
-              
-              <p style="color: #4b5563; line-height: 1.6;">
-                We're excited to inform you that you've been <strong>selected for the ${positionTitle}</strong> role at <strong>Synnectify Technologies</strong>! 🎉
-              </p>
-              
-              <p style="color: #4b5563; line-height: 1.6;">
-                Your application journey has successfully reached the <strong>final stage</strong>, and we're thrilled to have you move forward.
-              </p>
-              
-              <div style="background: #d1fae5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
-                <p style="color: #065f46; margin: 0; line-height: 1.6;">
-                  <strong>✅ Next Steps:</strong><br/>
-                  Our HR team will be in touch with you shortly to discuss <strong>the next steps and onboarding details</strong>.
-                </p>
-              </div>
-              
-              <p style="color: #4b5563; line-height: 1.6;">
-                If you have any questions in the meantime, feel free to reply to this email.
-              </p>
-              
-              <p style="color: #4b5563; line-height: 1.6;">
-                Thank you for your time and effort throughout the process — we're looking forward to working with you!
-              </p>
-              
-              <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                <p style="color: #1f2937; font-weight: bold; margin: 0;">Best Regards,</p>
-                <p style="color: #4b5563; margin: 5px 0 0 0;">Synnectify Technologies Team</p>
-                <p style="color: #f97316; margin: 5px 0 0 0;">
-                  <a href="mailto:careers.synnectify@gmail.com" style="color: #f97316; text-decoration: none;">careers@synnectify.com</a>
-                </p>
-                <p style="color: #3b82f6; margin: 5px 0 0 0;">
-                  <a href="https://technologies.synnectify.com" style="color: #3b82f6; text-decoration: none;">https://technologies.synnectify.com</a>
-                </p>
-              </div>
-              
-              <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 20px;">
-                &copy; ${new Date().getFullYear()} SYNNECTIFY. All rights reserved.
-              </p>
-            </div>
-          </div>
-        `;
-      } else {
-        // For other statuses (Pending, etc.) - generic email
-        html = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; border-radius: 10px;">
-            <div style="background: linear-gradient(135deg, #f97316 0%, #3b82f6 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-              <h1 style="color: white; margin: 0; font-size: 28px;">SYNNECTIFY</h1>
-              <p style="color: white; margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Career Portal</p>
-            </div>
-            
-            <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px;">
-              <h2 style="color: #1f2937; margin-top: 0;">Application Status Update</h2>
-              
-              <p style="color: #4b5563; line-height: 1.6;">Dear <strong>${application.name}</strong>,</p>
-              
-              <p style="color: #4b5563; line-height: 1.6;">
-                Your application status for <strong>${application.jobId?.title || 'the position'}</strong> has been updated to: <strong>${status}</strong>.
-              </p>
-              
-              <p style="color: #6b7280; font-size: 13px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                <strong>Note:</strong> This is an automated no-reply email. For inquiries, contact <a href="mailto:careers.synnectify@gmail.com" style="color: #f97316;">careers.synnectify@gmail.com</a>
-              </p>
-              
-              <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 20px;">
-                &copy; ${new Date().getFullYear()} SYNNECTIFY. All rights reserved.
-              </p>
-            </div>
-          </div>
-        `;
-      }
-      
       try {
-        await sendEmail(application.email, subject, html);
-        console.log(`✅ Email sent for ${status} status to ${application.email}`);
+        if (status === 'Shortlisted') {
+          await sendShortlisted({
+            to: application.email,
+            applicantName: application.name,
+            jobTitle: application.jobId?.title || 'the applied position'
+          });
+          console.log(`✅ Shortlisted email sent to ${application.email}`);
+        } else if (status === 'Rejected') {
+          await sendRejected({
+            to: application.email,
+            applicantName: application.name,
+            jobTitle: application.jobId?.title || 'the applied position'
+          });
+          console.log(`✅ Rejected email sent to ${application.email}`);
+        } else if (status === 'Interview') {
+          // For interview status, we'll use the existing logic in the schedule-interview route
+          // This is for manual status updates to Interview without scheduling details
+          await sendInterviewScheduled({
+            to: application.email,
+            applicantName: application.name,
+            jobTitle: application.jobId?.title || 'the applied position',
+            dateTime: application.interviewDetails?.date ? 
+              `${application.interviewDetails?.date} ${application.interviewDetails?.time || ''}` : 
+              'To be confirmed',
+            meetingLink: application.interviewDetails?.meetingLink || 'To be confirmed'
+          });
+          console.log(`✅ Interview scheduled email sent to ${application.email}`);
+        } else if (status === 'Completed') {
+          await sendCompleted({
+            to: application.email,
+            applicantName: application.name,
+            jobTitle: application.jobId?.title || 'the applied position'
+          });
+          console.log(`✅ Completed email sent to ${application.email}`);
+        } else {
+          // For other statuses (Pending, etc.) - generic email
+          const subject = `Application Status Update - ${application.jobId?.title || 'Position'} at SYNNECTIFY`;
+          const html = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; border-radius: 10px;">
+              <div style="background: linear-gradient(135deg, #f97316 0%, #3b82f6 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
+                <h1 style="color: white; margin: 0; font-size: 28px;">SYNNECTIFY</h1>
+                <p style="color: white; margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Career Portal</p>
+              </div>
+              
+              <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px;">
+                <h2 style="color: #1f2937; margin-top: 0;">Application Status Update</h2>
+                
+                <p style="color: #4b5563; line-height: 1.6;">Dear <strong>${application.name}</strong>,</p>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                  Your application status for <strong>${application.jobId?.title || 'the position'}</strong> has been updated to: <strong>${status}</strong>.
+                </p>
+                
+                <p style="color: #6b7280; font-size: 13px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                  <strong>Note:</strong> This is an automated no-reply email. For inquiries, contact <a href="mailto:careers.synnectify@gmail.com" style="color: #f97316;">careers.synnectify@gmail.com</a>
+                </p>
+                
+                <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 20px;">
+                  &copy; ${new Date().getFullYear()} SYNNECTIFY. All rights reserved.
+                </p>
+              </div>
+            </div>
+          `;
+          
+          await sendEmail(application.email, subject, html);
+          console.log(`✅ Generic status email sent to ${application.email}`);
+        }
       } catch (emailError) {
         console.error(`⚠️ Failed to send email for ${status} status:`, emailError.message);
       }
@@ -637,55 +409,15 @@ router.patch('/:id/schedule-interview', verifyToken, requireAdmin, async (req, r
     ).populate('jobId');
     if (!application) return res.status(404).json({ error: 'Application not found' });
 
-    // Send interview confirmation email
-    const subject = `Interview Scheduled - ${application.jobId?.title || 'Position'} at SYNNECTIFY`;
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; border-radius: 10px;">
-        <div style="background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 28px;">SYNNECTIFY</h1>
-          <p style="color: white; margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Career Portal</p>
-        </div>
-        
-        <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px;">
-          <h2 style="color: #7e22ce; margin-top: 0;">📅 Interview Scheduled!</h2>
-          
-          <p style="color: #4b5563; line-height: 1.6;">Dear <strong>${application.name}</strong>,</p>
-          
-          <p style="color: #4b5563; line-height: 1.6;">
-            Great news! You have been selected for the next round of interviews for the position of <strong>${application.jobId?.title || 'the applied position'}</strong> at SYNNECTIFY.
-          </p>
-          
-          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #1f2937; margin-top: 0; font-size: 16px;">Interview Details:</h3>
-            <ul style="color: #4b5563; margin: 10px 0; padding-left: 20px;">
-              <li><strong>Date:</strong> ${sanitizedInterviewDetails.date || 'To be confirmed'}</li>
-              <li><strong>Time:</strong> ${sanitizedInterviewDetails.time || 'To be confirmed'}</li>
-              <li><strong>Location/Link:</strong> ${sanitizedInterviewDetails.meetingLink || 'To be confirmed'}</li>
-            </ul>
-          </div>
-          
-          <p style="color: #4b5563; line-height: 1.6;">
-            Please confirm your availability for the scheduled interview. If you need to reschedule, please contact us at least 24 hours in advance.
-          </p>
-          
-          ${sanitizedInterviewDetails.comments ? `<div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #1f2937; margin-top: 0; font-size: 16px;">Additional Notes:</h3>
-            <p style="color: #4b5563; margin: 10px 0;">${sanitizedInterviewDetails.comments}</p>
-          </div>` : ''}
-          
-          <p style="color: #6b7280; font-size: 13px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-            <strong>Note:</strong> This is an automated no-reply email. For inquiries, contact <a href="mailto:careers.synnectify@gmail.com" style="color: #f97316;">careers.synnectify@gmail.com</a>
-          </p>
-          
-          <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 20px;">
-            &copy; ${new Date().getFullYear()} SYNNECTIFY. All rights reserved.
-          </p>
-        </div>
-      </div>
-    `;
-    
+    // Send interview confirmation email using the new email service
     try {
-      await sendEmail(application.email, subject, html);
+      await sendInterviewScheduled({
+        to: application.email,
+        applicantName: application.name,
+        jobTitle: application.jobId?.title || 'the applied position',
+        dateTime: `${sanitizedInterviewDetails.date} ${sanitizedInterviewDetails.time}`,
+        meetingLink: sanitizedInterviewDetails.meetingLink
+      });
       console.log(`✅ Interview confirmation email sent to ${application.email}`);
     } catch (emailError) {
       console.error(`⚠️ Failed to send interview email:`, emailError.message);
