@@ -32,15 +32,25 @@ const AdminLoginPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD }),
       });
 
       console.log('Login response status:', response.status);
-      const data = await response.json();
-      console.log('Login response data:', data);
+      console.log('Login response headers:', [...response.headers.entries()]);
+      
+      // Try to get response data
+      let data;
+      try {
+        data = await response.json();
+        console.log('Login response data:', data);
+      } catch (parseError) {
+        const text = await response.text();
+        console.log('Login response text (parse failed):', text);
+        data = { error: `Server returned ${response.status}: ${text}` };
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || "Login failed");
+        throw new Error(data.error || `Server error: ${response.status} ${response.statusText}`);
       }
 
       // If OTP is required, move to OTP step
@@ -61,7 +71,9 @@ const AdminLoginPage = () => {
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError(err instanceof Error ? err.message : "Login failed. Please check your credentials.");
+      const errorMessage = err instanceof Error ? err.message : "Login failed. Please check your credentials.";
+      console.error('Login error message:', errorMessage);
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -121,7 +133,7 @@ const AdminLoginPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD }),
       });
 
       console.log('Resend OTP response status:', response.status);
