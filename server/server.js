@@ -215,6 +215,15 @@ app.get('/api/health/email', async (req, res) => {
     const { sendEmail } = require('./utils/mailer');
     
     console.log('Email health check requested');
+    console.log('Environment variables check:', {
+      EMAIL_USER: process.env.EMAIL_USER,
+      EMAIL_PASSWORD: process.env.EMAIL_PASSWORD ? 'SET' : 'MISSING',
+      EMAIL_FROM: process.env.EMAIL_FROM || 'NOT SET',
+      EMAIL_REPLY_TO: process.env.EMAIL_REPLY_TO || 'NOT SET',
+      SMTP_HOST: process.env.SMTP_HOST || 'DEFAULT',
+      SMTP_PORT: process.env.SMTP_PORT || 'DEFAULT',
+      NODE_ENV: process.env.NODE_ENV || 'development'
+    });
     
     // Validate email configuration
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
@@ -256,7 +265,8 @@ app.get('/api/health/email', async (req, res) => {
     res.status(500).json({ 
       error: 'Email health check failed',
       details: error.message,
-      code: error.code
+      code: error.code,
+      stack: error.stack
     });
   }
 });
