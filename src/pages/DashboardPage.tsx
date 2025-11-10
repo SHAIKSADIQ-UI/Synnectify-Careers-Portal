@@ -116,6 +116,16 @@ const DashboardPage = () => {
   }, [user]);
 
   const handleApply = (jobId: string, jobTitle: string) => {
+    // ✅ Check if user has already applied for this job
+    const hasApplied = apps.some(app => 
+      app.jobId && app.jobId._id === jobId
+    );
+    
+    if (hasApplied) {
+      alert("You have already applied for this position.");
+      return;
+    }
+    
     navigate("/apply", { state: { jobId, position: jobTitle } });
   };
 
