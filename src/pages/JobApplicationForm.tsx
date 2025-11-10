@@ -364,8 +364,6 @@ const JobApplicationForm = () => {
           errorMessage = response.statusText || errorMessage;
         }
         setSubmitError(errorMessage);
-        // Re-enable the submit button on error
-        setIsSubmitting(false);
       }
     } catch (error) {
       // More detailed error handling
@@ -375,7 +373,8 @@ const JobApplicationForm = () => {
       } else {
         setSubmitError("An unexpected error occurred while submitting the application. Please try again.");
       }
-      // Re-enable the submit button on error
+    } finally {
+      // Always reset the submitting state
       setIsSubmitting(false);
     }
   };
