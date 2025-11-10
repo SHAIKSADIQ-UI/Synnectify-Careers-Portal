@@ -149,6 +149,74 @@ app.get('/api/test-email', async (req, res) => {
   }
 });
 
+// Test email configuration endpoint
+app.post('/api/test-email-config', async (req, res) => {
+  try {
+    const { sendEmail } = require('./utils/mailer');
+    
+    console.log('Email configuration test requested');
+    console.log('Environment variables check:', {
+      EMAIL_USER: process.env.EMAIL_USER,
+      EMAIL_PASSWORD: process.env.EMAIL_PASSWORD ? 'SET' : 'MISSING',
+      EMAIL_FROM: process.env.EMAIL_FROM || 'NOT SET',
+      EMAIL_REPLY_TO: process.env.EMAIL_REPLY_TO || 'NOT SET',
+      SMTP_HOST: process.env.SMTP_HOST || 'DEFAULT',
+      SMTP_PORT: process.env.SMTP_PORT || 'DEFAULT',
+      NODE_ENV: process.env.NODE_ENV || 'development'
+    });
+    
+    // Validate email configuration
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+      return res.status(400).json({ 
+        error: 'Email configuration incomplete',
+        details: 'EMAIL_USER and EMAIL_PASSWORD must be set in environment variables',
+        envCheck: {
+          EMAIL_USER: process.env.EMAIL_USER ? 'SET' : 'MISSING',
+          EMAIL_PASSWORD: process.env.EMAIL_PASSWORD ? 'SET' : 'MISSING',
+          SMTP_HOST: process.env.SMTP_HOST || 'DEFAULT',
+          SMTP_PORT: process.env.SMTP_PORT || 'DEFAULT'
+        }
+      });
+    }
+    
+    // Test sending a simple email
+    const result = await sendEmail(
+      process.env.EMAIL_USER, // Send to admin email
+      'Email Configuration Test - SYNNECTIFY',
+      `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #333;">SYNNECTIFY Email Configuration Test</h2>
+        <p>This is a test email to verify that the email configuration is working correctly.</p>
+        <p><strong>Timestamp:</strong> ${new Date().toISOString()}</p>
+        <p><strong>Server:</strong> ${req.get('host')}</p>
+        <p><strong>Environment:</strong> ${process.env.NODE_ENV || 'development'}</p>
+        <p>If you received this email, the email configuration is working properly.</p>
+        <br>
+        <p>Best regards,<br>SYNNECTIFY Team</p>
+      </div>
+      `
+    );
+    
+    console.log('Email configuration test sent successfully:', result.messageId);
+    
+    res.json({ 
+      message: 'Email configuration test successful!',
+      messageId: result.messageId,
+      accepted: result.accepted || [],
+      rejected: result.rejected || [],
+      environment: process.env.NODE_ENV || 'development'
+    });
+  } catch (error) {
+    console.error('Email configuration test failed:', error);
+    res.status(500).json({ 
+      error: 'Email configuration test failed',
+      details: error.message,
+      code: error.code,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+
 // Environment variables check endpoint
 app.get('/api/env-check', (req, res) => {
   const envVars = {

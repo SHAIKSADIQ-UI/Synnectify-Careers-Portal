@@ -82,15 +82,41 @@ async function sendEmail(to, subject, html, replyTo = null) {
       replyTo: replyToAddress
     });
     
-    const info = await transporter.sendMail(mailOptions);
+    // Implement retry logic for transient failures
+    let lastError;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        console.log(`📧 Sending email attempt ${attempt}/3`);
+        const info = await transporter.sendMail(mailOptions);
+        
+        console.log(`✅ Email sent successfully to ${to}`);
+        console.log(`📧 Message ID: ${info.messageId}`);
+        console.log(`📧 Reply-To: ${replyToAddress}`);
+        
+        return info;
+      } catch (error) {
+        lastError = error;
+        console.error(`📧 Email sending attempt ${attempt} failed:`, error.message);
+        
+        // Don't retry on authentication errors or bad requests
+        if (error.code === 'EAUTH' || error.code === 'EENVELOPE' || error.code === 'EMESSAGE') {
+          console.error('📧 Non-retryable error encountered, aborting retries');
+          throw error;
+        }
+        
+        // Wait before retrying (exponential backoff)
+        if (attempt < 3) {
+          const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+          console.log(`📧 Waiting ${delay}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    }
     
-    console.log(`✅ Email sent successfully to ${to}`);
-    console.log(`📧 Message ID: ${info.messageId}`);
-    console.log(`📧 Reply-To: ${replyToAddress}`);
-    
-    return info;
+    // If all retries failed, throw the last error
+    throw lastError;
   } catch (error) {
-    console.error('❌ Email sending failed:', error.message);
+    console.error('❌ Email sending failed after all retries:', error.message);
     console.error('📧 Recipient:', to);
     console.error('📧 Subject:', subject);
     console.error('📧 Error code:', error.code);
@@ -103,6 +129,18 @@ async function sendEmail(to, subject, html, replyTo = null) {
       console.error('1. EMAIL_USER and EMAIL_PASSWORD are set correctly in .env');
       console.error('2. If using Gmail, enable "App Passwords" with 2FA');
       console.error('3. Visit: https://myaccount.google.com/apppasswords\n');
+    } else if (error.code === 'ECONNREFUSED') {
+      console.error('\n⚠️ CONNECTION ERROR:');
+      console.error('Please check:');
+      console.error('1. SMTP_HOST and SMTP_PORT are correct');
+      console.error('2. Network connectivity to the email server');
+      console.error('3. Firewall settings allowing outbound connections\n');
+    } else if (error.code === 'ETIMEDOUT') {
+      console.error('\n⚠️ TIMEOUT ERROR:');
+      console.error('Please check:');
+      console.error('1. Network connectivity to the email server');
+      console.error('2. DNS resolution for the SMTP server');
+      console.error('3. Server response time\n');
     }
     
     throw error;

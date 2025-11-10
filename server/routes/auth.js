@@ -115,7 +115,7 @@ router.post('/admin-login', async (req, res) => {
     
     console.log('OTP saved to database with ID:', otpRecord._id);
 
-    // Send OTP via email
+    // Send OTP via email with retry logic
     try {
       console.log('Attempting to send OTP email to:', email);
       console.log('Email configuration check:', {
@@ -125,45 +125,61 @@ router.post('/admin-login', async (req, res) => {
         SMTP_PORT: process.env.SMTP_PORT
       });
       
-      // Add timeout to email sending to prevent hanging
-      const emailPromise = sendEmail(
-        email,
-        'Admin Panel Login - OTP Verification',
-        `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #333;">SYNNECTIFY Admin Login</h2>
-          <p>Hello Admin,</p>
-          <p>You are receiving this email because a login attempt was made to the SYNNECTIFY admin panel.</p>
-          <p>Your one-time password (OTP) is:</p>
-          <div style="background-color: #f5f5f5; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; border-radius: 5px;">
-            ${otpCode}
-          </div>
-          <p>This OTP is valid for 5 minutes and can only be used once.</p>
-          <p>If you did not attempt to log in, please ignore this email.</p>
-          <br>
-          <p>Best regards,<br>SYNNECTIFY Team</p>
-        </div>
-        `
-      );
+      // Attempt to send email with retries
+      let emailResult;
+      let lastError;
       
-      // Add timeout of 10 seconds
-      const emailResult = await Promise.race([
-        emailPromise,
-        new Promise((_, reject) => {
-          const timeout = setTimeout(() => {
-            console.error('Email sending timeout after 10 seconds');
-            reject(new Error('Email sending timeout'));
-          }, 10000);
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          console.log(`📧 Sending OTP email attempt ${attempt}/3`);
+          emailResult = await sendEmail(
+            email,
+            'Admin Panel Login - OTP Verification',
+            `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <h2 style="color: #333;">SYNNECTIFY Admin Login</h2>
+              <p>Hello Admin,</p>
+              <p>You are receiving this email because a login attempt was made to the SYNNECTIFY admin panel.</p>
+              <p>Your one-time password (OTP) is:</p>
+              <div style="background-color: #f5f5f5; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; border-radius: 5px;">
+                ${otpCode}
+              </div>
+              <p>This OTP is valid for 5 minutes and can only be used once.</p>
+              <p>If you did not attempt to log in, please ignore this email.</p>
+              <br>
+              <p>Best regards,<br>SYNNECTIFY Team</p>
+            </div>
+            `
+          );
           
-          // Clear timeout when promise resolves
-          emailPromise.then(() => clearTimeout(timeout)).catch(() => clearTimeout(timeout));
-        })
-      ]);
+          console.log('OTP email sent successfully to:', email);
+          console.log('Email result:', JSON.stringify(emailResult, null, 2));
+          break; // Success, exit retry loop
+        } catch (error) {
+          lastError = error;
+          console.error(`📧 OTP email attempt ${attempt} failed:`, error.message);
+          
+          // Don't retry on authentication errors or bad requests
+          if (error.code === 'EAUTH' || error.code === 'EENVELOPE' || error.code === 'EMESSAGE') {
+            console.error('📧 Non-retryable error encountered, aborting retries');
+            throw error;
+          }
+          
+          // Wait before retrying (exponential backoff)
+          if (attempt < 3) {
+            const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+            console.log(`📧 Waiting ${delay}ms before retry...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+          }
+        }
+      }
       
-      console.log('OTP email sent successfully to:', email);
-      console.log('Email result:', JSON.stringify(emailResult, null, 2));
+      // If all retries failed, throw the last error
+      if (!emailResult) {
+        throw lastError;
+      }
     } catch (emailError) {
-      console.error('Failed to send OTP email:', emailError);
+      console.error('Failed to send OTP email after all retries:', emailError);
       console.error('Email error details:');
       console.error('Message:', emailError.message);
       console.error('Code:', emailError.code);
@@ -185,7 +201,17 @@ router.post('/admin-login', async (req, res) => {
         console.error('Failed to cleanup OTP record:', cleanupError);
       }
       
-      return res.status(500).json({ error: 'Failed to send OTP. Please try again.' });
+      return res.status(500).json({ 
+        error: 'Failed to send OTP. Please try again.',
+        details: process.env.NODE_ENV === 'development' ? emailError.message : undefined,
+        // Provide user-friendly retry suggestions
+        suggestions: [
+          'Check your internet connection',
+          'Verify email service is working',
+          'Try again in a few minutes',
+          'Contact system administrator if issue persists'
+        ]
+      });
     }
 
     // Respond with success but indicate OTP verification is needed
