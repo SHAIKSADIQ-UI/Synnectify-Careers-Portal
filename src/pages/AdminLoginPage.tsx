@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Lock, Mail, Eye, EyeOff, Shield } from "lucide-react";
 
 // OTP IMPLEMENTATION START
-const API_URL = import.meta.env.VITE_API_URL || "https://synnectify-backend.onrender.com/api";
+// Use relative path for API calls to work with proxy in development and direct calls in production
+const API_URL = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? '/api' : 'https://synnectify-backend.onrender.com/api');
 const ADMIN_EMAIL = "careers.synnectify@gmail.com";
 const ADMIN_PASSWORD = "Synnectify-Careers_2906";
 // OTP IMPLEMENTATION END
@@ -26,14 +27,22 @@ const AdminLoginPage = () => {
     setLoading(true);
 
     try {
-      console.log('Attempting admin login with:', { email, password });
+      console.log('Attempting admin login with API_URL:', API_URL);
+      
+      // Add timeout to fetch request
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+      
       const response = await fetch(`${API_URL}/auth/admin-login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD }),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
 
       console.log('Login response status:', response.status);
       console.log('Login response headers:', [...response.headers.entries()]);
@@ -69,11 +78,17 @@ const AdminLoginPage = () => {
         // Redirect to admin dashboard
         navigate("/admin");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Login error:', err);
-      const errorMessage = err instanceof Error ? err.message : "Login failed. Please check your credentials.";
-      console.error('Login error message:', errorMessage);
-      setError(errorMessage);
+      
+      // Handle timeout specifically
+      if (err.name === 'AbortError') {
+        setError("Request timeout - the server is taking too long to respond. Please try again.");
+      } else {
+        const errorMessage = err instanceof Error ? err.message : "Login failed. Please check your credentials.";
+        console.error('Login error message:', errorMessage);
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }

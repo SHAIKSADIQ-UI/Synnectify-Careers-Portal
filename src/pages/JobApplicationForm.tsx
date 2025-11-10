@@ -229,79 +229,49 @@ const JobApplicationForm = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Prevent double submission
-    if (isSubmitting) return;
-    
+    if (!formData.declaration) {
+      setSubmitError("Please agree to the declaration.");
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitError("");
 
     try {
-      // Create FormData object to handle file upload
       const formDataToSend = new FormData();
       
-      // Add the fields that the backend expects
-      formDataToSend.append('firstName', formData.firstName);
-      formDataToSend.append('lastName', formData.lastName);
-      formDataToSend.append('email', formData.email);
-      formDataToSend.append('phone', formData.phone);
-      formDataToSend.append('dob', formData.dob);
-      formDataToSend.append('gender', formData.gender);
-      formDataToSend.append('address', formData.address);
-      formDataToSend.append('country', formData.country);
-      formDataToSend.append('state', formData.state);
-      formDataToSend.append('city', formData.city);
-      formDataToSend.append('zipCode', formData.zipCode);
-      formDataToSend.append('currentPosition', formData.currentPosition);
-      formDataToSend.append('currentCompany', formData.currentCompany);
-      formDataToSend.append('totalExperience', formData.totalExperience);
-      formDataToSend.append('skills', formData.skills);
-      formDataToSend.append('expertise', formData.expertise);
-      formDataToSend.append('education', formData.education);
-      formDataToSend.append('experience', formData.experience);
-      formDataToSend.append('portfolio', formData.portfolio);
-      formDataToSend.append('github', formData.github);
-      formDataToSend.append('linkedin', formData.linkedin);
-      
-      // Add position and jobId if available
-      formDataToSend.append('position', position);
-      if (jobId) {
-        formDataToSend.append('jobId', jobId);
-      }
-      
-      // Add name as combination of first and last name
-      const fullName = `${formData.firstName} ${formData.lastName}`;
-      formDataToSend.append('name', fullName);
-      
-      // Add message (cover letter)
-      formDataToSend.append('message', formData.coverLetter);
-      
-      // Add resume file if it exists
-      if (formData.resume instanceof File) {
-        formDataToSend.append('resume', formData.resume);
-      }
-
-      // Log the form data for debugging
-      console.log("Submitting application with data:", {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phone: formData.phone,
-        position: position,
-        jobId: jobId
+      // Add all form fields to FormData
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key !== 'resume' && value !== null && value !== undefined) {
+          formDataToSend.append(key, value.toString());
+        }
       });
+
+      // Add resume file if present
+      if (formData.resume) {
+        formDataToSend.append("resume", formData.resume);
+      }
 
       // Use the API URL from environment variables with fallback to relative path for Vercel
       // This ensures it works both in local development and production deployments
-      const API_URL = import.meta.env.VITE_API_URL || "/api";
+      const API_URL = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? '/api' : 'https://synnectify-backend.onrender.com/api');
 
+      console.log('Submitting application to:', `${API_URL}/applications/apply`);
+      
+      // Add timeout to fetch request
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
       // Try to submit to the correct API endpoint
       const response = await fetch(`${API_URL}/applications/apply`, {
         method: "POST",
         body: formDataToSend,
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
 
       console.log("Response status:", response.status);
 
@@ -365,11 +335,15 @@ const JobApplicationForm = () => {
         }
         setSubmitError(errorMessage);
       }
-    } catch (error) {
+    } catch (error: any) {
       // More detailed error handling
       console.error("Submission error:", error);
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        setSubmitError("Network error - please check your connection and try again.");
+      
+      // Handle timeout specifically
+      if (error.name === 'AbortError') {
+        setSubmitError("Request timeout - the server is taking too long to respond. Please try again.");
+      } else if (error instanceof TypeError && error.message.includes('fetch')) {
+        setSubmitError("Network error - please check your connection and try again. If you're seeing this error, the backend server may be temporarily unavailable.");
       } else {
         setSubmitError("An unexpected error occurred while submitting the application. Please try again.");
       }

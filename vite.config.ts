@@ -10,6 +10,14 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: false, // Will try 5174, 5175 if 5173 is busy
+    proxy: {
+      '/api': {
+        target: 'https://synnectify-backend.onrender.com',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api')
+      }
+    }
   },
   build: {
     chunkSizeWarningLimit: 1000, // Increase limit to 1000kb to reduce warnings

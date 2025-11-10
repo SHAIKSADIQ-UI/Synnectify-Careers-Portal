@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS Test</title>
+</head>
+<body>
+    <h1>CORS Test for SYNNECTIFY Application</h1>
+    <button onclick="testCORS()">Test CORS Request</button>
+    <div id="result"></div>
+
+    <script>
+        async function testCORS() {
+            const resultDiv = document.getElementById('result');
+            try {
+                resultDiv.innerHTML = 'Testing CORS...';
+                
+                // Test the ping endpoint
+                const response = await fetch('http://localhost:5000/api/ping');
+                const data = await response.json();
+                
+                if (data.status === 'active') {
+                    resultDiv.innerHTML = '✅ CORS Test Successful! API is accessible.';
+                    resultDiv.style.color = 'green';
+                } else {
+                    resultDiv.innerHTML = '❌ CORS Test Failed! Unexpected response.';
+                    resultDiv.style.color = 'red';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ CORS Test Failed! Error: ${error.message}`;
+                resultDiv.style.color = 'red';
+            }
+        }
+    </script>
+</body>
+</html>
