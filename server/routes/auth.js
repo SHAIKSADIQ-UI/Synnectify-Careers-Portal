@@ -149,9 +149,15 @@ router.post('/admin-login', async (req, res) => {
       // Add timeout of 10 seconds
       const emailResult = await Promise.race([
         emailPromise,
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Email sending timeout')), 10000)
-        )
+        new Promise((_, reject) => {
+          const timeout = setTimeout(() => {
+            console.error('Email sending timeout after 10 seconds');
+            reject(new Error('Email sending timeout'));
+          }, 10000);
+          
+          // Clear timeout when promise resolves
+          emailPromise.then(() => clearTimeout(timeout)).catch(() => clearTimeout(timeout));
+        })
       ]);
       
       console.log('OTP email sent successfully to:', email);
@@ -162,6 +168,14 @@ router.post('/admin-login', async (req, res) => {
       console.error('Message:', emailError.message);
       console.error('Code:', emailError.code);
       console.error('Stack:', emailError.stack);
+      
+      // Log environment variables for debugging (without exposing passwords)
+      console.log('Environment variables for debugging:');
+      console.log('EMAIL_USER:', process.env.EMAIL_USER);
+      console.log('EMAIL_PASSWORD set:', !!process.env.EMAIL_PASSWORD);
+      console.log('SMTP_HOST:', process.env.SMTP_HOST);
+      console.log('SMTP_PORT:', process.env.SMTP_PORT);
+      console.log('NODE_ENV:', process.env.NODE_ENV);
       
       // Delete the OTP record since we couldn't send the email
       try {
