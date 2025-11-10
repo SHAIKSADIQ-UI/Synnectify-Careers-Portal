@@ -125,7 +125,8 @@ router.post('/admin-login', async (req, res) => {
         SMTP_PORT: process.env.SMTP_PORT
       });
       
-      const emailResult = await sendEmail(
+      // Add timeout to email sending to prevent hanging
+      const emailPromise = sendEmail(
         email,
         'Admin Panel Login - OTP Verification',
         `
@@ -144,6 +145,15 @@ router.post('/admin-login', async (req, res) => {
         </div>
         `
       );
+      
+      // Add timeout of 10 seconds
+      const emailResult = await Promise.race([
+        emailPromise,
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Email sending timeout')), 10000)
+        )
+      ]);
+      
       console.log('OTP email sent successfully to:', email);
       console.log('Email result:', JSON.stringify(emailResult, null, 2));
     } catch (emailError) {
