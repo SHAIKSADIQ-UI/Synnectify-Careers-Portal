@@ -12,7 +12,7 @@ async function testEmail() {
   try {
     console.log('📧 Testing email configuration...');
     console.log(`📧 EMAIL_USER: ${process.env.EMAIL_USER}`);
-    console.log(`📧 EMAIL_PASS: ${process.env.EMAIL_PASS ? 'SET' : 'NOT SET'}`);
+    console.log(`📧 EMAIL_PASSWORD: ${process.env.EMAIL_PASSWORD ? 'SET' : 'NOT SET'}`);
     console.log(`📧 EMAIL_FROM: ${process.env.EMAIL_FROM}`);
     console.log(`📧 EMAIL_REPLY_TO: ${process.env.EMAIL_REPLY_TO}`);
     console.log(`📧 SMTP_HOST: ${process.env.SMTP_HOST}`);
@@ -49,7 +49,7 @@ async function testEmail() {
       console.error('\n🔐 AUTHENTICATION ERROR:');
       console.error('Please verify:');
       console.error('1. EMAIL_USER is set to careers.synnectify@gmail.com');
-      console.error('2. EMAIL_PASS is set to your Google App Password: sodk lmmq yivk lftv');
+      console.error('2. EMAIL_PASSWORD is set to your Google App Password: sodk lmmq yivk lftv');
       console.error('3. Gmail App Password is correctly generated with 2FA enabled');
       console.error('4. Visit: https://myaccount.google.com/apppasswords to verify');
     }

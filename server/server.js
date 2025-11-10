@@ -102,18 +102,18 @@ app.get('/api/test-email', async (req, res) => {
     console.log('Email test requested');
     console.log('Email configuration:', {
       EMAIL_USER: process.env.EMAIL_USER,
-      EMAIL_PASS: process.env.EMAIL_PASS ? 'SET' : 'MISSING',
+      EMAIL_PASSWORD: process.env.EMAIL_PASSWORD ? 'SET' : 'MISSING',
       SMTP_HOST: process.env.SMTP_HOST,
       SMTP_PORT: process.env.SMTP_PORT
     });
     
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
       return res.status(400).json({ 
         error: 'Email configuration incomplete',
-        details: 'EMAIL_USER and EMAIL_PASS must be set in environment variables',
+        details: 'EMAIL_USER and EMAIL_PASSWORD must be set in environment variables',
         envCheck: {
           EMAIL_USER: process.env.EMAIL_USER ? 'SET' : 'MISSING',
-          EMAIL_PASS: process.env.EMAIL_PASS ? 'SET' : 'MISSING',
+          EMAIL_PASSWORD: process.env.EMAIL_PASSWORD ? 'SET' : 'MISSING',
           SMTP_HOST: process.env.SMTP_HOST || 'DEFAULT',
           SMTP_PORT: process.env.SMTP_PORT || 'DEFAULT'
         }
@@ -217,10 +217,10 @@ app.get('/api/health/email', async (req, res) => {
     console.log('Email health check requested');
     
     // Validate email configuration
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
       return res.status(400).json({ 
         error: 'Email configuration incomplete',
-        details: 'EMAIL_USER and EMAIL_PASS must be set in environment variables'
+        details: 'EMAIL_USER and EMAIL_PASSWORD must be set in environment variables'
       });
     }
     
