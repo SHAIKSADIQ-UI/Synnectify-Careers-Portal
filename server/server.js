@@ -22,7 +22,11 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:5175',
-  'https://synnectify-careers-portal.vercel.app' // Add Vercel frontend URL explicitly
+  'https://synnectify-careers-portal.vercel.app',
+  // Add wildcard for Vercel preview deployments
+  /\.vercel\.app$/,
+  // Add wildcard for Render deployments
+  /\.onrender\.com$/
 ].filter(Boolean);
 
 // In production, only allow specific domains
@@ -37,7 +41,14 @@ app.use(
       if (!origin) return callback(null, true);
       
       // Check if origin is in allowed list
-      if (allowedOrigins.indexOf(origin) !== -1) {
+      if (allowedOrigins.some(allowedOrigin => {
+        if (typeof allowedOrigin === 'string') {
+          return origin === allowedOrigin;
+        } else if (allowedOrigin instanceof RegExp) {
+          return allowedOrigin.test(origin);
+        }
+        return false;
+      })) {
         return callback(null, true);
       }
       
@@ -142,20 +153,112 @@ app.get('/api/test-email', async (req, res) => {
 app.get('/api/env-check', (req, res) => {
   const envVars = {
     EMAIL_USER: process.env.EMAIL_USER ? 'SET' : 'MISSING',
-    EMAIL_PASS: process.env.EMAIL_PASS ? 'SET' : 'MISSING',
+    EMAIL_PASSWORD: process.env.EMAIL_PASSWORD ? 'SET' : 'MISSING',
     EMAIL_FROM: process.env.EMAIL_FROM || 'NOT SET',
     EMAIL_REPLY_TO: process.env.EMAIL_REPLY_TO || 'NOT SET',
     SMTP_HOST: process.env.SMTP_HOST || 'DEFAULT',
     SMTP_PORT: process.env.SMTP_PORT || 'DEFAULT',
-    NODE_ENV: process.env.NODE_ENV || 'development'
+    NODE_ENV: process.env.NODE_ENV || 'development',
+    CLIENT_URL: process.env.CLIENT_URL || 'NOT SET',
+    PORT: process.env.PORT || '5000'
   };
   
   console.log('Environment variables check:', envVars);
   
+  // Check if critical variables are set
+  const criticalVars = ['EMAIL_USER', 'EMAIL_PASSWORD'];
+  const missingVars = criticalVars.filter(varName => !process.env[varName]);
+  
   res.json({
     message: 'Environment variables status',
-    envVars
+    envVars,
+    criticalCheck: {
+      status: missingVars.length === 0 ? 'OK' : 'WARNING',
+      missing: missingVars,
+      message: missingVars.length === 0 
+        ? 'All critical environment variables are set' 
+        : `Missing critical variables: ${missingVars.join(', ')}`
+    },
+    deploymentInfo: {
+      environment: process.env.NODE_ENV || 'development',
+      port: process.env.PORT || 5000,
+      clientUrl: process.env.CLIENT_URL || 'Not set'
+    }
   });
+});
+
+// Email health check endpoint
+app.get('/api/health/email', async (req, res) => {
+  // Allow this endpoint in production only with an authorization header for security
+  if (process.env.NODE_ENV === 'production') {
+    const authHeader = req.headers.authorization;
+    const expectedToken = process.env.HEALTH_CHECK_TOKEN || 'dev-token';
+    
+    // If no auth header or invalid token, return forbidden
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(403).json({ 
+        error: 'Forbidden', 
+        message: 'Authorization header required for email health check in production' 
+      });
+    }
+    
+    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    if (token !== expectedToken) {
+      return res.status(403).json({ 
+        error: 'Forbidden', 
+        message: 'Invalid authorization token' 
+      });
+    }
+  }
+  
+  try {
+    const { sendEmail } = require('./utils/mailer');
+    
+    console.log('Email health check requested');
+    
+    // Validate email configuration
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      return res.status(400).json({ 
+        error: 'Email configuration incomplete',
+        details: 'EMAIL_USER and EMAIL_PASS must be set in environment variables'
+      });
+    }
+    
+    // Send a test email
+    const result = await sendEmail(
+      process.env.EMAIL_USER, // Send to admin email
+      'Email Health Check - SYNNECTIFY',
+      `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #333;">SYNNECTIFY Email Health Check</h2>
+        <p>This is a test email to verify that the email system is working correctly.</p>
+        <p><strong>Timestamp:</strong> ${new Date().toISOString()}</p>
+        <p><strong>Server:</strong> ${req.get('host')}</p>
+        <p><strong>Environment:</strong> ${process.env.NODE_ENV || 'development'}</p>
+        <p>If you received this email, the email system is functioning properly.</p>
+        <br>
+        <p>Best regards,<br>SYNNECTIFY Team</p>
+      </div>
+      `
+    );
+    
+    console.log('Email health check sent successfully:', result.messageId);
+    
+    res.json({ 
+      message: 'Email health check sent successfully!',
+      messageId: result.messageId,
+      accepted: result.accepted || [],
+      rejected: result.rejected || [],
+      environment: process.env.NODE_ENV || 'development'
+    });
+  } catch (error) {
+    console.error('Email health check failed:', error);
+    res.status(500).json({ 
+      error: 'Email health check failed',
+      details: error.message,
+      code: error.code
+    });
+  }
 });
 
 // Routes
@@ -189,7 +292,7 @@ connectDB()
       console.log(`🚀 Server running on http://localhost:${PORT}`);
       console.log(`📊 Environment: ${NODE_ENV}`);
       console.log(`🗄️  Database: Connected`);
-      console.log(`📧 Email: ${process.env.EMAIL_USER ? 'Configured' : '⚠️  Not configured'}`);
+      console.log(`📧 Email: ${process.env.EMAIL_USER && process.env.EMAIL_PASSWORD ? 'Configured' : '⚠️  Not configured'}`);
       console.log(`🔐 CORS: ${allowedOrigins.length} origins allowed`);
       console.log('='.repeat(50));
     });

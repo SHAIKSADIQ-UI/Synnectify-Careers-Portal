@@ -7,11 +7,11 @@ const transporter = nodemailer.createTransport({
   secure: true, // true for 465, false for other ports
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    pass: process.env.EMAIL_PASSWORD,
   },
-  // Additional security options
+  // Additional security options for Gmail
   tls: {
-    rejectUnauthorized: true,
+    rejectUnauthorized: false, // Set to false for Gmail App Passwords
     minVersion: 'TLSv1.2'
   }
 });
@@ -33,7 +33,18 @@ async function sendEmail(to, subject, html, replyTo = null) {
   console.log('SMTP_HOST:', process.env.SMTP_HOST || 'DEFAULT');
   console.log('SMTP_PORT:', process.env.SMTP_PORT || 'DEFAULT');
   
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+  // Validate email configuration
+  if (!process.env.EMAIL_USER) {
+    console.error('❌ EMAIL_USER is not set in environment variables');
+    return { skipped: true };
+  }
+  
+  if (!process.env.EMAIL_PASSWORD) {
+    console.error('❌ EMAIL_PASSWORD is not set in environment variables');
+    return { skipped: true };
+  }
+  
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
     console.warn('⚠️ EMAIL_USER or EMAIL_PASS not configured. Skipping email send.');
     console.warn('📧 Would have sent email to:', to);
     console.warn('📧 Subject:', subject);

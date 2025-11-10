@@ -73,7 +73,7 @@ JWT_SECRET=<generate-strong-random-string-here>
 
 # Email
 EMAIL_USER=noreply@synnectify.com
-EMAIL_PASS=<gmail-app-password-here>
+EMAIL_PASSWORD=<gmail-app-password-here>
 EMAIL_FROM=SYNNECTIFY Careers <noreply@synnectify.com>
 EMAIL_REPLY_TO=careers.synnectify@gmail.com
 

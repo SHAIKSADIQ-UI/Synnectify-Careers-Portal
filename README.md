@@ -108,7 +108,7 @@ IT_Website/
    PORT=5000
    MONGODB_URI=your_mongodb_connection_string
    EMAIL_USER=your_email
-   EMAIL_PASS=your_app_password
+   EMAIL_PASSWORD=your_app_password
    ```
 
 4. **Start the application**
