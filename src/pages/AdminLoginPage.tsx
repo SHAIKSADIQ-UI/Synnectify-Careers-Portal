@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Lock, Mail, Eye, EyeOff, Shield } from "lucide-react";
 
 // OTP IMPLEMENTATION START
-// Use relative path for API calls to work with proxy in development and direct calls in production
-const API_URL = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? '/api' : 'https://synnectify-backend.onrender.com/api');
+import { API_URL } from '../utils/api';
 const ADMIN_EMAIL = "careers.synnectify@gmail.com";
 const ADMIN_PASSWORD = "Synnectify-Careers_2906";
 // OTP IMPLEMENTATION END

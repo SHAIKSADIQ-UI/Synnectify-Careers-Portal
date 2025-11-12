@@ -117,13 +117,39 @@ router.post('/admin-login', async (req, res) => {
 
     // Send OTP via email with retry logic
     try {
-      console.log('Attempting to send OTP email to:', email);
-      console.log('Email configuration check:', {
-        EMAIL_USER: process.env.EMAIL_USER,
+      console.log('📧 Attempting to send OTP email to:', email);
+      console.log('📧 Email configuration check:', {
+        EMAIL_USER: process.env.EMAIL_USER ? `${process.env.EMAIL_USER.substring(0, 3)}***` : 'MISSING',
         EMAIL_PASSWORD: process.env.EMAIL_PASSWORD ? 'SET' : 'MISSING',
-        SMTP_HOST: process.env.SMTP_HOST,
-        SMTP_PORT: process.env.SMTP_PORT
+        SMTP_HOST: process.env.SMTP_HOST || 'DEFAULT (smtp.gmail.com)',
+        SMTP_PORT: process.env.SMTP_PORT || 'DEFAULT (465)',
+        NODE_ENV: process.env.NODE_ENV || 'development'
       });
+      
+      // Validate email configuration before attempting to send
+      if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+        const missingVars = [];
+        if (!process.env.EMAIL_USER) missingVars.push('EMAIL_USER');
+        if (!process.env.EMAIL_PASSWORD) missingVars.push('EMAIL_PASSWORD');
+        
+        console.error(`❌ Missing required environment variables: ${missingVars.join(', ')}`);
+        console.error('⚠️ Please set these variables in Render environment settings');
+        
+        // Delete the OTP record since we can't send the email
+        try {
+          await OTP.findByIdAndDelete(otpRecord._id);
+          console.log('Cleaned up OTP record due to missing email configuration');
+        } catch (cleanupError) {
+          console.error('Failed to cleanup OTP record:', cleanupError);
+        }
+        
+        return res.status(500).json({ 
+          error: 'Email service is not configured. Please contact the system administrator.',
+          details: process.env.NODE_ENV === 'development' 
+            ? `Missing environment variables: ${missingVars.join(', ')}. Please set these in Render.`
+            : undefined
+        });
+      }
       
       // Attempt to send email with retries
       let emailResult;
@@ -152,12 +178,13 @@ router.post('/admin-login', async (req, res) => {
             `
           );
           
-          console.log('OTP email sent successfully to:', email);
-          console.log('Email result:', JSON.stringify(emailResult, null, 2));
+          console.log('✅ OTP email sent successfully to:', email);
+          console.log('📧 Email message ID:', emailResult.messageId || 'N/A');
           break; // Success, exit retry loop
         } catch (error) {
           lastError = error;
-          console.error(`📧 OTP email attempt ${attempt} failed:`, error.message);
+          console.error(`📧 OTP email attempt ${attempt}/3 failed:`, error.message);
+          console.error('📧 Error code:', error.code);
           
           // Don't retry on authentication errors or bad requests
           if (error.code === 'EAUTH' || error.code === 'EENVELOPE' || error.code === 'EMESSAGE') {
@@ -179,38 +206,60 @@ router.post('/admin-login', async (req, res) => {
         throw lastError;
       }
     } catch (emailError) {
-      console.error('Failed to send OTP email after all retries:', emailError);
-      console.error('Email error details:');
-      console.error('Message:', emailError.message);
-      console.error('Code:', emailError.code);
-      console.error('Stack:', emailError.stack);
+      console.error('❌ Failed to send OTP email after all retries:', emailError);
+      console.error('📧 Email error details:');
+      console.error('  Message:', emailError.message);
+      console.error('  Code:', emailError.code);
+      console.error('  Command:', emailError.command || 'N/A');
+      console.error('  Response:', emailError.response || 'N/A');
+      
+      // Provide specific error messages based on error code
+      let errorMessage = 'Failed to send OTP. Please try again.';
+      let troubleshootingTips = [];
+      
+      if (emailError.code === 'EAUTH') {
+        errorMessage = 'Email authentication failed. Please check email configuration.';
+        troubleshootingTips = [
+          'Verify EMAIL_USER and EMAIL_PASSWORD are set correctly in Render',
+          'Ensure you are using a Gmail App Password, not your regular password',
+          'Check that 2-Step Verification is enabled on your Google account'
+        ];
+      } else if (emailError.code === 'ECONNREFUSED' || emailError.code === 'ETIMEDOUT') {
+        errorMessage = 'Cannot connect to email server. Please check network configuration.';
+        troubleshootingTips = [
+          'Verify SMTP_HOST and SMTP_PORT are correct',
+          'Check network connectivity to the email server',
+          'Ensure firewall allows outbound connections on port 465'
+        ];
+      } else if (emailError.message && emailError.message.includes('Missing environment variables')) {
+        errorMessage = 'Email service is not configured. Please contact the system administrator.';
+        troubleshootingTips = [
+          'EMAIL_USER and EMAIL_PASSWORD must be set in Render environment variables',
+          'Check Render dashboard → Environment settings'
+        ];
+      }
       
       // Log environment variables for debugging (without exposing passwords)
-      console.log('Environment variables for debugging:');
-      console.log('EMAIL_USER:', process.env.EMAIL_USER);
-      console.log('EMAIL_PASSWORD set:', !!process.env.EMAIL_PASSWORD);
-      console.log('SMTP_HOST:', process.env.SMTP_HOST);
-      console.log('SMTP_PORT:', process.env.SMTP_PORT);
-      console.log('NODE_ENV:', process.env.NODE_ENV);
+      console.log('🔍 Environment variables status:');
+      console.log('  EMAIL_USER:', process.env.EMAIL_USER ? 'SET' : 'MISSING');
+      console.log('  EMAIL_PASSWORD:', process.env.EMAIL_PASSWORD ? 'SET' : 'MISSING');
+      console.log('  SMTP_HOST:', process.env.SMTP_HOST || 'DEFAULT');
+      console.log('  SMTP_PORT:', process.env.SMTP_PORT || 'DEFAULT');
+      console.log('  NODE_ENV:', process.env.NODE_ENV || 'development');
       
       // Delete the OTP record since we couldn't send the email
       try {
         await OTP.findByIdAndDelete(otpRecord._id);
-        console.log('Cleaned up OTP record due to email failure');
+        console.log('✅ Cleaned up OTP record due to email failure');
       } catch (cleanupError) {
-        console.error('Failed to cleanup OTP record:', cleanupError);
+        console.error('⚠️ Failed to cleanup OTP record:', cleanupError);
       }
       
       return res.status(500).json({ 
-        error: 'Failed to send OTP. Please try again.',
+        error: errorMessage,
         details: process.env.NODE_ENV === 'development' ? emailError.message : undefined,
-        // Provide user-friendly retry suggestions
-        suggestions: [
-          'Check your internet connection',
-          'Verify email service is working',
-          'Try again in a few minutes',
-          'Contact system administrator if issue persists'
-        ]
+        code: emailError.code,
+        troubleshooting: process.env.NODE_ENV === 'development' ? troubleshootingTips : undefined
       });
     }
 

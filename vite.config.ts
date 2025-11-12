@@ -12,7 +12,7 @@ export default defineConfig({
     strictPort: false, // Will try 5174, 5175 if 5173 is busy
     proxy: {
       '/api': {
-        target: 'https://synnectify-backend.onrender.com',
+        target: 'https://synnectify-careers-portal-production.up.railway.app',
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/api/, '/api')

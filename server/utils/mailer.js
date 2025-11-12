@@ -1,17 +1,28 @@
 const nodemailer = require('nodemailer');
 
-// Create reusable transporter with error handling
+// Create reusable transporter with better reliability on hosted platforms
+const resolvedPort = Number(process.env.SMTP_PORT || 587);
+const resolvedHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+const isSecure = resolvedPort === 465; // 465 = SSL/TLS, 587 = STARTTLS
+
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: Number(process.env.SMTP_PORT || 465),
-  secure: true, // true for 465, false for other ports
+  host: resolvedHost,
+  port: resolvedPort,
+  secure: isSecure,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD,
   },
-  // Additional security options for Gmail
+  // Connection tuning to mitigate ETIMEDOUT on free instances / cold starts
+  pool: true,
+  maxConnections: 2,
+  maxMessages: 20,
+  connectionTimeout: 30000, // 30s
+  socketTimeout: 30000,      // 30s
+  greetingTimeout: 15000,    // 15s
+  // TLS options
   tls: {
-    rejectUnauthorized: false, // Set to false for Gmail App Passwords
+    rejectUnauthorized: false,
     minVersion: 'TLSv1.2'
   }
 });
@@ -26,29 +37,38 @@ const transporter = nodemailer.createTransport({
  */
 async function sendEmail(to, subject, html, replyTo = null) {
   console.log('=== EMAIL CONFIGURATION CHECK ===');
-  console.log('EMAIL_USER:', process.env.EMAIL_USER ? 'SET' : 'MISSING');
+  console.log('EMAIL_USER:', process.env.EMAIL_USER ? `${process.env.EMAIL_USER.substring(0, 3)}***` : 'MISSING');
   console.log('EMAIL_PASSWORD:', process.env.EMAIL_PASSWORD ? 'SET' : 'MISSING');
   console.log('EMAIL_FROM:', process.env.EMAIL_FROM || 'NOT SET');
   console.log('EMAIL_REPLY_TO:', process.env.EMAIL_REPLY_TO || 'NOT SET');
-  console.log('SMTP_HOST:', process.env.SMTP_HOST || 'DEFAULT');
-  console.log('SMTP_PORT:', process.env.SMTP_PORT || 'DEFAULT');
+  console.log('SMTP_HOST:', process.env.SMTP_HOST || 'DEFAULT (smtp.gmail.com)');
+  console.log('SMTP_PORT:', process.env.SMTP_PORT || 'DEFAULT (465)');
+  console.log('NODE_ENV:', process.env.NODE_ENV || 'development');
   
   // Validate email configuration
-  if (!process.env.EMAIL_USER) {
-    console.error('❌ EMAIL_USER is not set in environment variables');
-    return { skipped: true };
-  }
-  
-  if (!process.env.EMAIL_PASSWORD) {
-    console.error('❌ EMAIL_PASSWORD is not set in environment variables');
-    return { skipped: true };
-  }
-  
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
-    console.warn('⚠️ EMAIL_USER or EMAIL_PASSWORD not configured. Skipping email send.');
-    console.warn('📧 Would have sent email to:', to);
-    console.warn('📧 Subject:', subject);
-    return { skipped: true };
+    const missingVars = [];
+    if (!process.env.EMAIL_USER) missingVars.push('EMAIL_USER');
+    if (!process.env.EMAIL_PASSWORD) missingVars.push('EMAIL_PASSWORD');
+    
+    console.error(`❌ Missing required environment variables: ${missingVars.join(', ')}`);
+    console.error('⚠️ EMAIL_USER or EMAIL_PASSWORD not configured. Skipping email send.');
+    console.error('📧 Would have sent email to:', to);
+    console.error('📧 Subject:', subject);
+    
+    // In production, throw error to ensure it's noticed
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(`Email configuration incomplete: Missing ${missingVars.join(', ')}. Please set these environment variables in Render.`);
+    }
+    
+    return { skipped: true, error: `Missing environment variables: ${missingVars.join(', ')}` };
+  }
+  
+  // Validate email addresses
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(to)) {
+    console.error(`❌ Invalid recipient email address: ${to}`);
+    throw new Error(`Invalid email address: ${to}`);
   }
   
   try {
@@ -59,7 +79,8 @@ async function sendEmail(to, subject, html, replyTo = null) {
     // Determine reply-to address
     const replyToAddress = replyTo || 
       process.env.EMAIL_REPLY_TO || 
-      'careers.synnectify@gmail.com'; // OTP IMPLEMENTATION START - Use correct email
+      process.env.EMAIL_USER || 
+      'careers.synnectify@gmail.com';
     
     const mailOptions = {
       from: fromAddress,
@@ -113,7 +134,40 @@ async function sendEmail(to, subject, html, replyTo = null) {
       }
     }
     
-    // If all retries failed, throw the last error
+    // If all SMTP retries failed, try HTTP provider fallback (Resend) if configured
+    if (process.env.RESEND_API_KEY) {
+      try {
+        console.warn('📨 SMTP failed after retries. Falling back to Resend API...');
+        const fromAddress = process.env.EMAIL_FROM || 'onboarding@resend.dev';
+        const resp = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            from: fromAddress,
+            to: [to],
+            subject,
+            html
+          })
+        });
+        if (!resp.ok) {
+          const text = await resp.text();
+          console.error('❌ Resend API failed:', resp.status, text);
+          throw lastError;
+        }
+        const data = await resp.json();
+        console.log('✅ Email sent via Resend API. Id:', data.id);
+        return { provider: 'resend', id: data.id };
+      } catch (fallbackErr) {
+        console.error('❌ Resend fallback failed:', fallbackErr.message);
+        // Rethrow the original SMTP error to preserve error context
+        throw lastError;
+      }
+    }
+
+    // Fallback not configured; rethrow SMTP error
     throw lastError;
   } catch (error) {
     console.error('❌ Email sending failed after all retries:', error.message);

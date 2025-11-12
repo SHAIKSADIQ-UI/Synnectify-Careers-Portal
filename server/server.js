@@ -19,49 +19,66 @@ app.use(express.json({ limit: '10mb' }));
 // CORS Configuration
 const allowedOrigins = [
   process.env.CLIENT_URL,
+  process.env.FRONTEND_URL,
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:5175',
   'https://synnectify-careers-portal.vercel.app',
   // Add wildcard for Vercel preview deployments
-  /\.vercel\.app$/,
-  // Add wildcard for Render deployments
-  /\.onrender\.com$/
+  /^https:\/\/.*\.vercel\.app$/,
+  // Add wildcard for Render deployments (frontend if deployed there)
+  /^https:\/\/.*\.onrender\.com$/
 ].filter(Boolean);
 
-// In production, only allow specific domains
-if (process.env.NODE_ENV === 'production') {
-  console.log('🔒 Production mode: CORS restricted to:', allowedOrigins.filter(Boolean));
-}
+// Log allowed origins for debugging
+console.log('🔒 CORS Configuration:');
+console.log('  - CLIENT_URL:', process.env.CLIENT_URL || 'NOT SET');
+console.log('  - FRONTEND_URL:', process.env.FRONTEND_URL || 'NOT SET');
+console.log('  - Allowed origins:', allowedOrigins.length);
 
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
+      if (!origin) {
+        console.log('⚠️  Request with no origin (allowing)');
+        return callback(null, true);
+      }
+      
+      console.log('🌐 CORS check for origin:', origin);
       
       // Check if origin is in allowed list
-      if (allowedOrigins.some(allowedOrigin => {
+      const isAllowed = allowedOrigins.some(allowedOrigin => {
         if (typeof allowedOrigin === 'string') {
-          return origin === allowedOrigin;
+          const matches = origin === allowedOrigin;
+          if (matches) console.log(`✅ Origin matched string: ${allowedOrigin}`);
+          return matches;
         } else if (allowedOrigin instanceof RegExp) {
-          return allowedOrigin.test(origin);
+          const matches = allowedOrigin.test(origin);
+          if (matches) console.log(`✅ Origin matched regex: ${allowedOrigin}`);
+          return matches;
         }
         return false;
-      })) {
+      });
+      
+      if (isAllowed) {
         return callback(null, true);
       }
       
       // In development, be more permissive
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV !== 'production') {
         console.log('⚠️  Development mode: Allowing origin', origin);
         return callback(null, true);
       }
       
+      console.error(`❌ CORS blocked origin: ${origin}`);
       const msg = `The CORS policy for this site does not allow access from the specified origin: ${origin}`;
       return callback(new Error(msg), false);
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
   })
 );
 

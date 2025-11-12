@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Upload, CheckCircle } from "lucide-react";
+import { API_URL } from "../utils/api";
 
 // Indian states data
 const indianStates = [
@@ -254,15 +255,11 @@ const JobApplicationForm = () => {
         formDataToSend.append("resume", formData.resume);
       }
 
-      // Use the API URL from environment variables with fallback to relative path for Vercel
-      // This ensures it works both in local development and production deployments
-      const API_URL = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? '/api' : 'https://synnectify-backend.onrender.com/api');
-
       console.log('Submitting application to:', `${API_URL}/applications/apply`);
       
-      // Add timeout to fetch request
+      // Add timeout to fetch request (Render cold starts and email dispatch may take time)
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 seconds
       
       // Try to submit to the correct API endpoint
       const response = await fetch(`${API_URL}/applications/apply`, {

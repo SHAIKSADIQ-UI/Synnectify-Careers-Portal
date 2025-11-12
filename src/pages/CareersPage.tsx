@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 
 // Use the correct API URL from environment variables, with a fallback
-const API_URL = import.meta.env.VITE_API_URL || "https://synnectify-backend.onrender.com/api";
+import { API_URL } from '../utils/api';
 
 interface Job {
   _id: string;

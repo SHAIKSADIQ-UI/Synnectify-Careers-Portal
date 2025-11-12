@@ -164,39 +164,49 @@ router.post('/apply', upload.single('resume'), async (req, res) => {
     
     console.log(`✅ Application created successfully: ${appDoc._id} for ${jobTitle}`);
 
-    // Try to send emails, but don't fail the application if emails fail
-    try {
-      console.log('Sending company notification email to: careers.synnectify@gmail.com');
-      await notifyAdminOnNewApplication({
-        toAdmin: 'careers.synnectify@gmail.com',
-        jobTitle: jobTitle,
-        applicantName: fullName,
-        applicationId: appDoc._id
-      });
-      console.log('✅ Company notification email sent');
-    } catch (emailError) {
-      console.error('⚠️ Failed to send company email, but application saved:', emailError.message);
-      // Log additional error details for debugging
-      console.error('Email error stack:', emailError.stack);
-    }
-
-    try {
-      console.log('Sending applicant confirmation email to:', applicantEmail);
-      await sendApplicationReceived({
-        to: applicantEmail,
-        applicantName: fullName,
-        jobTitle: jobTitle,
-        applicationId: appDoc._id
-      });
-      console.log('✅ Applicant confirmation email sent');
-    } catch (emailError) {
-      console.error('⚠️ Failed to send applicant email, but application saved:', emailError.message);
-      // Log additional error details for debugging
-      console.error('Email error stack:', emailError.stack);
-    }
-
-    console.log('=== APPLICATION SUBMISSION COMPLETE ===');
+    // Respond immediately after saving the application
+    console.log('=== APPLICATION SUBMISSION COMPLETE (responding immediately) ===');
     res.status(201).json({ message: 'Application submitted successfully', application: appDoc });
+
+    // Fire-and-forget email sending to avoid delaying the response
+    // This keeps the original behavior (notify admin + applicant) without blocking the client
+    try {
+      console.log('📧 Queueing emails (non-blocking) ...');
+      const tasks = [
+        notifyAdminOnNewApplication({
+          toAdmin: 'careers.synnectify@gmail.com',
+          jobTitle: jobTitle,
+          applicantName: fullName,
+          applicationId: appDoc._id
+        }),
+        sendApplicationReceived({
+          to: applicantEmail,
+          applicantName: fullName,
+          jobTitle: jobTitle,
+          applicationId: appDoc._id
+        })
+      ];
+
+      Promise.allSettled(tasks).then((results) => {
+        const [adminRes, applicantRes] = results;
+        if (adminRes.status === 'fulfilled') {
+          console.log('✅ Company notification email sent successfully');
+        } else {
+          const e = adminRes.reason || {};
+          console.error('⚠️ Failed to send company email:', e.message || e);
+        }
+        if (applicantRes.status === 'fulfilled') {
+          console.log('✅ Applicant confirmation email sent successfully');
+        } else {
+          const e = applicantRes.reason || {};
+          console.error('⚠️ Failed to send applicant email:', e.message || e);
+        }
+      }).catch((e) => {
+        console.error('⚠️ Email dispatch encountered an unexpected error:', e.message || e);
+      });
+    } catch (dispatchErr) {
+      console.error('⚠️ Failed to queue emails:', dispatchErr.message || dispatchErr);
+    }
   } catch (err) {
     console.error('❌ Application submission error:', err);
     console.error('Error details:', err.message);
