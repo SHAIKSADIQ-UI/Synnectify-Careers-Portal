@@ -81,7 +81,8 @@ const CareersPage = () => {
   const handleApplyClick = async (jobId: string, jobTitle: string) => {
     // ✅ Check if user has already applied for this job
     const hasApplied = userApplications.some(app => 
-      app.jobId && app.jobId._id === jobId
+      (app.jobId && app.jobId._id === jobId) ||
+      (app.position && app.position.toLowerCase() === jobTitle.toLowerCase())
     );
     
     if (hasApplied) {

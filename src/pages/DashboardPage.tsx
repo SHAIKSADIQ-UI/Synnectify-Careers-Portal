@@ -19,10 +19,7 @@ import {
   Settings,
   Menu,
   X,
-  Circle,
-  Calendar,
-  UserCheck,
-  UserX,
+  Circle
 } from "lucide-react";
 import UserProfile from "../components/UserProfile";
 
@@ -54,7 +51,7 @@ interface Job {
 }
 
 const DashboardPage = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [apps, setApps] = useState<Application[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -118,7 +115,8 @@ const DashboardPage = () => {
   const handleApply = (jobId: string, jobTitle: string) => {
     // ✅ Check if user has already applied for this job
     const hasApplied = apps.some(app => 
-      app.jobId && app.jobId._id === jobId
+      (app.jobId && app.jobId._id === jobId) ||
+      (app.position && app.position.toLowerCase() === jobTitle.toLowerCase())
     );
     
     if (hasApplied) {

@@ -250,6 +250,14 @@ const JobApplicationForm = () => {
         }
       });
 
+      // Include job metadata for backend duplicate checks and accurate position storage
+      if (jobId) {
+        formDataToSend.append('jobId', jobId);
+      }
+      if (position) {
+        formDataToSend.append('position', position);
+      }
+
       // Add resume file if present
       if (formData.resume) {
         formDataToSend.append("resume", formData.resume);
@@ -280,9 +288,12 @@ const JobApplicationForm = () => {
         const userEmail = formData.email; // Use the email from the form
         if (userEmail) {
           const existingApps = JSON.parse(localStorage.getItem(`apps_${userEmail}`) || "[]");
+          const savedPosition = result.application?.position || position;
+          const savedJobId = result.application?.jobId?._id || jobId;
           const newApp = {
             _id: result.application._id,
-            position: position,
+            position: savedPosition,
+            jobId: result.application?.jobId || (savedJobId ? { _id: savedJobId } : undefined),
             appliedAt: new Date().toISOString(),
             status: "Pending"
           };
@@ -348,12 +359,6 @@ const JobApplicationForm = () => {
       // Always reset the submitting state
       setIsSubmitting(false);
     }
-  };
-
-  // Function to handle dashboard navigation
-  const goToDashboard = () => {
-    setShowSuccessModal(false);
-    navigate("/dashboard");
   };
 
   useEffect(() => {
